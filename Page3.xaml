@@ -1,0 +1,17 @@
+﻿<Page x:Class="XBAPLexiconCVDBInterface.Page3"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      mc:Ignorable="d" 
+      d:DesignHeight="500" d:DesignWidth="600"
+      Title="Lexicon CV Database"
+      Background="WhiteSmoke">
+
+
+    <Grid>
+        <Border BorderBrush="WhiteSmoke" BorderThickness="1" HorizontalAlignment="Left" Height="429" Margin="0,10,0,0" VerticalAlignment="Top" Width="562"/>
+        <Button x:Name="BtnPage2" Content="&lt;" HorizontalAlignment="Left" VerticalAlignment="Top" Width="40" Height="40" ToolTip="Previous" FontSize="18" Margin="477,389,0,0" RenderTransformOrigin="0.675,1.275" Click="BtnPage2_Click"/>
+        <Button x:Name="BtnPage4" Content="&gt;" HorizontalAlignment="Left" Margin="522,389,0,0" VerticalAlignment="Top" Width="40" Height="40" ToolTip="Next" FontSize="18"/>
+    </Grid>
+</Page>

@@ -4,21 +4,26 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       mc:Ignorable="d" 
-      d:DesignHeight="1024" d:DesignWidth="1280"
+      d:DesignHeight="1024" d:DesignWidth="1366"
       Title="Lexicon CV Database"
       Background="WhiteSmoke">
     <Grid>
-        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="80" Margin="0,10,0,0" VerticalAlignment="Top" Width="1270"/>
-
+        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="80" Margin="0,10,0,0" VerticalAlignment="Top" Width="1366" OpacityMask="Black" Background="Black"/>
+        <Label x:Name="LblPersonalInformation" Content="Name of chosen Person" HorizontalAlignment="Left" Margin="707,118,0,0" VerticalAlignment="Top" Height="38" Width="270" FontSize="20"/>
         <Button x:Name="BtnSearch" Content="Search" HorizontalAlignment="Left" Margin="438,141,0,0" VerticalAlignment="Top" Width="75"/>
-        <DataGrid HorizontalAlignment="Left" Margin="180,180,0,0" VerticalAlignment="Top" Height="250" Width="441"/>
-        <Image HorizontalAlignment="Left" Height="100" Margin="180,10,0,0" VerticalAlignment="Top" Width="100" Source="logo.png" DataContext=""/>
-        <Label Content="LblLoggedInAs" HorizontalAlignment="Left" Margin="527,22,0,0" VerticalAlignment="Top"/>
+        <DataGrid HorizontalAlignment="Left" Margin="100,180,0,0" VerticalAlignment="Top" Height="250" Width="521"/>
+        <Image HorizontalAlignment="Left" Height="80" Margin="100,10,0,0" VerticalAlignment="Top" Width="100" Source="logo.png" DataContext=""/>
+        <Label Content="LblLoggedInAs" HorizontalAlignment="Left" Margin="527,22,0,0" VerticalAlignment="Top" Foreground="#FFF08787"/>
         <Button x:Name="BtnCreate" Content="Create" HorizontalAlignment="Left" Margin="546,141,0,0" VerticalAlignment="Top" Width="75"/>
-        <TextBox x:Name="TxtBoxSearch" HorizontalAlignment="Left" Height="23" Margin="180,141,0,0" TextWrapping="Wrap" Text="Enter searchphrase" VerticalAlignment="Top" Width="237"/>
-        <Image HorizontalAlignment="Left" Height="100" Margin="1170,141,0,0" VerticalAlignment="Top" Width="100" Source="user.jpeg"/>
-        <TextBox x:Name="TxtbxFirstName" HorizontalAlignment="Left" Height="23" Margin="746,141,0,0" TextWrapping="Wrap" Text="First Name" VerticalAlignment="Top" Width="120"/>
-        <TextBox x:Name="TxtbxLastName" HorizontalAlignment="Left" Height="23" Margin="897,141,0,0" TextWrapping="Wrap" Text="Last Name" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="TxtBoxSearch" HorizontalAlignment="Left" Height="23" Margin="100,141,0,0" TextWrapping="Wrap" Text="Enter searchphrase" VerticalAlignment="Top" Width="317"/>
+        <Image HorizontalAlignment="Left" Height="100" Margin="1089,119,0,0" VerticalAlignment="Top" Width="100" Source="user.jpg"/>
+        
+        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="101" Margin="1088,118,0,0" VerticalAlignment="Top" Width="101"/>
+        
+        
+        <ListBox x:Name="LstbxTags" HorizontalAlignment="Left" Height="96" Margin="1194,119,0,0" VerticalAlignment="Top" Width="75" ToolTip="Tags"/>
+        
+        <Frame x:Name="FrmContent" Content="Frame" HorizontalAlignment="Left" Height="561" Margin="707,224,0,0" VerticalAlignment="Top" Width="562" Source="/XBAPLexiconCVDBInterface;component/Page2.xaml"/>
 
     </Grid>
 </Page>
