@@ -39,6 +39,8 @@ namespace XBAPLexiconCVDBInterface
             // Change the page of the frame.
             if (pageFrame != null)
             {
+                // This method also needs to save the information in the fields of page2
+                // to the database
                 pageFrame.Source = new Uri("Page3.xaml", UriKind.Relative);
             }
         }
