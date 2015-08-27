@@ -63,6 +63,7 @@ namespace XBAPLexiconCVDBInterface
 
         private void BtnAddReference_Click(object sender, RoutedEventArgs e)
         {
+
             // Öppna popupfönster och bygg en dictionary eller JSON-objekt med ett reference-objekt i.
             // Flytta sen dictionaryposten eller objektet tillbaks till page4 så det kan följa med till databasen
             // när vi sparar employment history-posten

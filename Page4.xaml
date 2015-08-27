@@ -1,8 +1,9 @@
-﻿<Page x:Class="XBAPLexiconCVDBInterface.Page4"
+﻿<Page
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:XBAPLexiconCVDBInterface" x:Class="XBAPLexiconCVDBInterface.Page4" 
       mc:Ignorable="d" 
       d:DesignHeight="500" d:DesignWidth="600"
       Title="Lexicon CV Database"
@@ -22,5 +23,12 @@
         <CheckBox x:Name="ChkbxCurrentEMP" Content="Currently employed" HorizontalAlignment="Left" Margin="359,258,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="TxtbxNotes" HorizontalAlignment="Left" Height="120" Margin="39,282,0,0" TextWrapping="Wrap" Text="Notes" VerticalAlignment="Top" Width="315" ToolTip="Notes"/>
         <Button x:Name="BtnAddReference" Content="Add Reference" HorizontalAlignment="Left" Margin="397,196,0,0" VerticalAlignment="Top" Width="90" Click="BtnAddReference_Click"/>
+        <Popup x:Name="PopupAddRef"  IsOpen="true" Height="300" Width="300" Margin="-110,30,0,0" Placement="Center" PopupAnimation="Fade">
+
+
+
+        </Popup>
+
+
     </Grid>
 </Page>
