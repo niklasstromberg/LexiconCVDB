@@ -23,6 +23,7 @@ namespace XBAPLexiconCVDBInterface
         public Page1()
         {
             InitializeComponent();
+            
         }
     }
 }

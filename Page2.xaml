@@ -22,14 +22,22 @@
         <TextBox x:Name="TxtbxMobile" HorizontalAlignment="Left" Height="23" Margin="314,71,0,0" TextWrapping="Wrap" Text="Mobile" VerticalAlignment="Top" Width="173" ToolTip="Mobile phone"/>
         <TextBox x:Name="TxtbxEmail" HorizontalAlignment="Left" Height="23" Margin="314,99,0,0" TextWrapping="Wrap" Text="Email Adress" VerticalAlignment="Top" Width="173" ToolTip="Email adress"/>
         <TextBox x:Name="TxtbxPersonalInfo" HorizontalAlignment="Left" Height="149" Margin="39,207,0,0" TextWrapping="Wrap" Text="Personal info" VerticalAlignment="Top" Width="448" ToolTip="Personal Information"/>
-        <DatePicker x:Name="DPDate" HorizontalAlignment="Left" Margin="39,42,0,0" VerticalAlignment="Top" Text="Date of Birth" ToolTip="Date of Birth"/>
+        <DatePicker x:Name="DPDate" HorizontalAlignment="Left" Margin="39,42,0,0" VerticalAlignment="Top" Text="Date of Birth" ToolTip="Date of Birth" FirstDayOfWeek="Monday"/>
         <Slider x:Name="SldSwedish" HorizontalAlignment="Left" Margin="207,156,0,0" VerticalAlignment="Top" Width="102" Maximum="5" Minimum="1" ToolTip="Swedish" AutoToolTipPlacement="TopLeft" IsSnapToTickEnabled="True"/>
         <Slider x:Name="SldEnglish" HorizontalAlignment="Left" Margin="207,181,0,0" VerticalAlignment="Top" Width="102" ToolTip="English" Maximum="5" Minimum="1" AutoToolTipPlacement="TopLeft" IsSnapToTickEnabled="True"/>
         <CheckBox x:Name="ChkbxLicence" Content="Drivers Licence" HorizontalAlignment="Left" Margin="388,156,0,0" VerticalAlignment="Top" ToolTip="Drivers Licence"/>
 
         <Label x:Name="LblEnglish" Content="English" HorizontalAlignment="Left" Margin="146,176,0,0" VerticalAlignment="Top"/>
         <Label x:Name="LblSwedish" Content="Swedish" HorizontalAlignment="Left" Margin="146,150,0,0" VerticalAlignment="Top"/>
-        <Button x:Name="BtnPage3" Content="&gt;" HorizontalAlignment="Left" Margin="522,389,0,0" VerticalAlignment="Top" Width="40" Height="40" ToolTip="Next" FontSize="18" Click="BtnPage3_Click"/>
+        <Button x:Name="BtnPage3" Content="&gt;" HorizontalAlignment="Left" Margin="522,389,0,0" VerticalAlignment="Top" Width="40" Height="40" ToolTip="Education" FontSize="18" Click="BtnPage3_Click"/>
         <Label x:Name="LblPage" Content="Personal Information" HorizontalAlignment="Left" Margin="444,358,0,0" VerticalAlignment="Top" Width="135"/>
+        <Expander x:Name="ExpLocations" Header="Locations" HorizontalAlignment="Left" Margin="39,71,0,0" VerticalAlignment="Top" Width="102" ToolTip="Locations">
+            <StackPanel>
+                <CheckBox Content="Malmö"/>
+                <CheckBox Content="Stockholm"/>
+                <CheckBox Content="Göteborg"/>
+                <CheckBox Content="Övriga Sverige"/>
+            </StackPanel>
+        </Expander>
     </Grid>
 </Page>

@@ -16,18 +16,16 @@ using System.Windows.Shapes;
 namespace XBAPLexiconCVDBInterface
 {
     /// <summary>
-    /// Interaction logic for Page3.xaml
+    /// Interaction logic for Page4.xaml
     /// </summary>
-    public partial class Page3 : Page
+    public partial class Page4 : Page
     {
-        public Page3()
+        public Page4()
         {
             InitializeComponent();
-            //List<Education> educations = new List<Education>();
-            //GrdEdu.ItemsSource = educations;
         }
 
-        private void BtnPage2_Click(object sender, RoutedEventArgs e)
+        private void BtnPage5_Click(object sender, RoutedEventArgs e)
         {
             // Find the frame.
             Frame pageFrame = null;
@@ -41,11 +39,11 @@ namespace XBAPLexiconCVDBInterface
             // Change the page of the frame.
             if (pageFrame != null)
             {
-                pageFrame.Source = new Uri("Page2.xaml", UriKind.Relative);
+                pageFrame.Source = new Uri("Page5.xaml", UriKind.Relative);
             }
         }
 
-        private void BtnPage4_Click(object sender, RoutedEventArgs e)
+        private void BtnPage3_Click(object sender, RoutedEventArgs e)
         {
             // Find the frame.
             Frame pageFrame = null;
@@ -59,8 +57,15 @@ namespace XBAPLexiconCVDBInterface
             // Change the page of the frame.
             if (pageFrame != null)
             {
-                pageFrame.Source = new Uri("Page4.xaml", UriKind.Relative);
+                pageFrame.Source = new Uri("Page3.xaml", UriKind.Relative);
             }
+        }
+
+        private void BtnAddReference_Click(object sender, RoutedEventArgs e)
+        {
+            // Öppna popupfönster och bygg en dictionary eller JSON-objekt med ett reference-objekt i.
+            // Flytta sen dictionaryposten eller objektet tillbaks till page4 så det kan följa med till databasen
+            // när vi sparar employment history-posten
         }
     }
 }

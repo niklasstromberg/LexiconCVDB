@@ -23,6 +23,9 @@ namespace XBAPLexiconCVDBInterface
         public Page2()
         {
             InitializeComponent();
+            // Här behöver vi hämta informationen som ska in i fälten ifrån databasen, så att vår page i frmContent
+            // alltid visare aktuell information
+            
         }
 
         private void BtnPage3_Click(object sender, RoutedEventArgs e)

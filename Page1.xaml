@@ -8,7 +8,7 @@
       Title="Lexicon CV Database"
       Background="WhiteSmoke">
     <Grid>
-        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="80" Margin="0,10,0,0" VerticalAlignment="Top" Width="1366" OpacityMask="Black" Background="Black"/>
+        <Border x:Name="HeaderBorder" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="80" Margin="0,10,0,0" VerticalAlignment="Top" OpacityMask="Black" Background="Black" Width="1366"/>
         <Label x:Name="LblPersonalInformation" Content="Name of chosen Person" HorizontalAlignment="Left" Margin="707,118,0,0" VerticalAlignment="Top" Height="38" Width="270" FontSize="20"/>
         <Button x:Name="BtnSearch" Content="Search" HorizontalAlignment="Left" Margin="438,141,0,0" VerticalAlignment="Top" Width="75"/>
         <DataGrid HorizontalAlignment="Left" Margin="100,180,0,0" VerticalAlignment="Top" Height="250" Width="521"/>
