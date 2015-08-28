@@ -23,7 +23,23 @@
         <CheckBox x:Name="ChkbxCurrentEMP" Content="Currently employed" HorizontalAlignment="Left" Margin="359,258,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="TxtbxNotes" HorizontalAlignment="Left" Height="120" Margin="39,282,0,0" TextWrapping="Wrap" Text="Notes" VerticalAlignment="Top" Width="315" ToolTip="Notes"/>
         <Button x:Name="BtnAddReference" Content="Add Reference" HorizontalAlignment="Left" Margin="397,196,0,0" VerticalAlignment="Top" Width="90" Click="BtnAddReference_Click"/>
-        <Popup x:Name="PopupAddRef"  IsOpen="true" Height="300" Width="300" Margin="-110,30,0,0" Placement="Center" PopupAnimation="Fade">
+        <Popup x:Name="PopupAddRef"  IsOpen="false"  Height="300" Width="300" PopupAnimation="Fade" PlacementTarget="{Binding ElementName=BtnAddReference}" AllowsTransparency="True" >
+            <StackPanel x:Name="StkpnlPopup">
+                <StackPanel.Background>
+                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                        <GradientStop Color="Black" Offset="0"/>
+                        <GradientStop Color="White" Offset="1"/>
+                    </LinearGradientBrush>
+                </StackPanel.Background>
+                <TextBox x:Name="TxtbxFirstNameRef" TextWrapping="Wrap" Margin="7" ToolTip="First Name" Height="23" Text="First Name"/>
+                <TextBox x:Name="TxtbxLastNameRef" Height="23" TextWrapping="Wrap" Text="Last Name" Margin="7" ToolTip="Last Name"/>
+                <TextBox x:Name="TxtbxTitleRef" Height="23" TextWrapping="Wrap" Text="Title" Margin="7" ToolTip="Title"/>
+                <TextBox x:Name="TxtbxCompanyRef" Height="23" TextWrapping="Wrap" Text="Company" Margin="7" ToolTip="Company"/>
+                <TextBox x:Name="TxtbxPhoneRef" Height="23" TextWrapping="Wrap" Text="Phone number" Margin="7" ToolTip="Phone number"/>
+                <TextBox x:Name="TxtbxMobileRef" Height="23" TextWrapping="Wrap" Text="Mobile phone" ToolTip="Mobile Phone" Margin="7"/>
+                <TextBox x:Name="TxtbxEmailRef" Height="23" TextWrapping="Wrap" Text="Email adress" ToolTip="Email adress" Margin="7"/>
+                <Button x:Name="BtnAddRef" Content="Add Reference" IsDefault="False" Margin="21,7" Click="BtnAddRef_Click" />
+            </StackPanel>
 
 
 

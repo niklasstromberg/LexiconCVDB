@@ -20,9 +20,12 @@ namespace XBAPLexiconCVDBInterface
     /// </summary>
     public partial class Page4 : Page
     {
+        bool isClicked = false;
+        
         public Page4()
         {
             InitializeComponent();
+
         }
 
         private void BtnPage5_Click(object sender, RoutedEventArgs e)
@@ -63,10 +66,29 @@ namespace XBAPLexiconCVDBInterface
 
         private void BtnAddReference_Click(object sender, RoutedEventArgs e)
         {
-
+            if (!isClicked)
+            {
+                isClicked = true;
+                PopupAddRef.IsOpen = true;
+            }
+            else
+            {
+                isClicked = false;
+                PopupAddRef.IsOpen = false;
+            }
+            //bool isOpen = true;
             // Öppna popupfönster och bygg en dictionary eller JSON-objekt med ett reference-objekt i.
             // Flytta sen dictionaryposten eller objektet tillbaks till page4 så det kan följa med till databasen
             // när vi sparar employment history-posten
         }
+
+        private void BtnAddRef_Click(object sender, RoutedEventArgs e)
+        {
+            // Spara reference till databasen och stäng popup
+            PopupAddRef.IsOpen = false;
+        }
+
+
+
     }
 }
