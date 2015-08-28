@@ -76,9 +76,9 @@ namespace XBAPLexiconCVDBInterface
                 isClicked = false;
                 PopupAddRef.IsOpen = false;
             }
-            //bool isOpen = true;
-            // Öppna popupfönster och bygg en dictionary eller JSON-objekt med ett reference-objekt i.
-            // Flytta sen dictionaryposten eller objektet tillbaks till page4 så det kan följa med till databasen
+
+            // bygg en array eller JSON-objekt med ett reference-objekt i.
+            // Spara till databasen, behåll REF_ID för referens till
             // när vi sparar employment history-posten
         }
 
