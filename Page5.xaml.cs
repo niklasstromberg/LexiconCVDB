@@ -20,25 +20,29 @@ namespace XBAPLexiconCVDBInterface
     /// </summary>
     public partial class Page5 : Page
     {
-        public List<string> skillsList = new List<string> { "c#", "d#", "dyslexia" };   // list of the chosen skills for the viewed person
+        public List<string> skillsList = new List<string>();   // list of the chosen skills for the viewed person
+        public List<string> tmpList = new List<string> { "c#", "d#", "dyslexia" }; 
         public string skillString = "";
         
         public Page5()
         {
             InitializeComponent();
 
-            // populate skillsArray from database
-            populateLabel();
+            // populate skillsList from database
+            PopulateLabel();
+            DataContext = skillsList;
+            skills.ItemsSource = tmpList;
 
         }
-        private void populateLabel()
+        private void PopulateLabel()
         {
             LblSkills.Content = "";
+            skillString = "";
             foreach (string str in skillsList)
             {
                 skillString += str + ", ";
             }
-            LblSkills.Content = "Skills ("+ skillsList.Count + "): " + skillString;
+            LblSkills.Content = "Skills (" + skillsList.Count + "): " + skillString + ", ";
         }
 
 
@@ -80,8 +84,18 @@ namespace XBAPLexiconCVDBInterface
 
         private void BtnTest_Click(object sender, RoutedEventArgs e)
         {
-            //Button btn = (Button)sender;
-            BtnTest.Background = Brushes.LightSeaGreen;
+            Button btn = (Button)sender;
+            btn.Background = btn.Background == Brushes.LightGreen ? (SolidColorBrush)(new BrushConverter().ConvertFrom("#FFDDDDDD")) : Brushes.LightGreen;
+            if (skillsList.Contains(btn.Content))
+            {
+                skillsList.Remove(btn.Content.ToString());
+                PopulateLabel();
+            }
+            else
+            {
+                skillsList.Add(btn.Content.ToString());
+                PopulateLabel();
+            }
         }
 
 
