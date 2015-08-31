@@ -20,7 +20,6 @@ namespace XBAPLexiconCVDBInterface
     /// </summary>
     public partial class Page4 : Page
     {
-        bool isClicked = false;
         
         public Page4()
         {
@@ -66,17 +65,15 @@ namespace XBAPLexiconCVDBInterface
 
         private void BtnAddReference_Click(object sender, RoutedEventArgs e)
         {
-            if (!isClicked)
-            {
-                isClicked = true;
-                PopupAddRef.IsOpen = true;
-            }
-            else
-            {
-                isClicked = false;
-                PopupAddRef.IsOpen = false;
-            }
-
+            //if (!PopupAddRef.IsOpen)
+            //{
+            //    PopupAddRef.IsOpen = true;
+            //}
+            //else
+            //{
+            //    PopupAddRef.IsOpen = false;
+            //}
+            PopupAddRef.IsOpen = PopupAddRef.IsOpen == true ? false : true;
             // bygg en array eller JSON-objekt med ett reference-objekt i.
             // Spara till databasen, behåll REF_ID för referens till
             // när vi sparar employment history-posten

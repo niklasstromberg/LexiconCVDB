@@ -17,12 +17,12 @@
         <Button x:Name="BtnCreate" Content="Create" HorizontalAlignment="Left" Margin="546,141,0,0" VerticalAlignment="Top" Width="75"/>
         <TextBox x:Name="TxtBoxSearch" HorizontalAlignment="Left" Height="23" Margin="100,141,0,0" TextWrapping="Wrap" Text="Enter searchphrase" VerticalAlignment="Top" Width="317"/>
         <Image HorizontalAlignment="Left" Height="100" Margin="1089,119,0,0" VerticalAlignment="Top" Width="100" Source="user.jpg"/>
-        
+
         <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="101" Margin="1088,118,0,0" VerticalAlignment="Top" Width="101"/>
-        
-        
-        <ListBox x:Name="LstbxTags" HorizontalAlignment="Left" Height="96" Margin="1194,119,0,0" VerticalAlignment="Top" Width="75" ToolTip="Tags"/>
-        
+
+
+        <ListBox x:Name="LstbxTags" HorizontalAlignment="Left" Height="311" Margin="1281,119,-55,0" VerticalAlignment="Top" Width="140" ToolTip="Tags"/>
+
         <Frame x:Name="FrmContent" Content="Frame" HorizontalAlignment="Left" Height="561" Margin="707,224,0,0" VerticalAlignment="Top" Width="562" Source="/XBAPLexiconCVDBInterface;component/Page2.xaml"/>
 
     </Grid>

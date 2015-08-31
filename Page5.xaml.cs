@@ -42,7 +42,7 @@ namespace XBAPLexiconCVDBInterface
             {
                 skillString += str + ", ";
             }
-            LblSkills.Content = "Skills (" + skillsList.Count + "): " + skillString + ", ";
+            LblSkills.Content = "Skills (" + skillsList.Count + "): " + skillString;
         }
 
 

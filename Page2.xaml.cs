@@ -47,5 +47,16 @@ namespace XBAPLexiconCVDBInterface
                 pageFrame.Source = new Uri("Page3.xaml", UriKind.Relative);
             }
         }
+
+        private void txtbxPersonalInfo_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            LblCounter.Content = "0 out of 1024";
+            TextBox txtbx = (TextBox)sender;
+            //var textBox = sender as TextBox;
+            int count = txtbx.Text.Length;
+            string content = count + " out of 1024";
+            LblCounter.Content = content.ToString();
+            
+        }
     }
 }
