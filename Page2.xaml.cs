@@ -29,7 +29,13 @@ namespace XBAPLexiconCVDBInterface
             // alltid visar aktuell information
             
 
-            
+        
+            TxtbxFirstName.Text = (App.Current as App).choice.first_name;
+            TxtbxLastName.Text = (App.Current as App).choice.last_name;
+            TxtbxTitle.Text = (App.Current as App).choice.title;
+            DPDate.SelectedDate = (App.Current as App).choice.date_of_birth;
+            SldSwedish.Value = (App.Current as App).choice.swedish;
+            SldEnglish.Value = (App.Current as App).choice.english;
         }
 
         private void BtnPage3_Click(object sender, RoutedEventArgs e)

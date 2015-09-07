@@ -28,7 +28,7 @@ namespace XBAPLexiconCVDBInterface
         public bool ping;
         public BlobRequestOptions bro = new BlobRequestOptions();
         public OperationContext oc = new OperationContext();
-
+        public UserToDisplay choice = new UserToDisplay();
 
         // method to check connection to azure storage
         public async Task<bool> checkConnection()
@@ -69,5 +69,25 @@ namespace XBAPLexiconCVDBInterface
         //    }
         //}
 
+    }
+
+    [Serializable]
+    public class UserToDisplay
+    {
+        public int user_id { get; set; }
+        public string first_name { get; set; }
+        public string last_name { get; set; }
+        public string title { get; set; }
+        public DateTime date_of_birth { get; set; }
+        public string phone { get; set; }
+        public string mobile { get; set; }
+        public string email { get; set; }
+        public int swedish { get; set; }
+        public int english { get; set; }
+        public bool driver { get; set; }
+        public string pers_info { get; set; }
+        public string synopsis { get; set; }
+        public string linkedin { get; set; }
+        
     }
 }

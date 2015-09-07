@@ -14,7 +14,7 @@
         <DataGrid x:Name="dgContentList" HorizontalAlignment="Left" Margin="100,180,0,0" VerticalAlignment="Top" Height="250" Width="521" AlternatingRowBackground="Beige" SelectionMode="Single" SelectionChanged="dgContentList_SelectionChanged" AutoGenerateColumns="True"/>
         <Image HorizontalAlignment="Left" Height="80" Margin="100,10,0,0" VerticalAlignment="Top" Width="100" Source="logo.png" DataContext=""/>
         <Label Content="LblLoggedInAs" HorizontalAlignment="Left" Margin="527,22,0,0" VerticalAlignment="Top" Foreground="#FFF08787"/>
-        <Button x:Name="BtnCreate" Content="Create" HorizontalAlignment="Left" Margin="546,141,0,0" VerticalAlignment="Top" Width="75"/>
+        <Button x:Name="BtnCreate" Content="Create" HorizontalAlignment="Left" Margin="546,141,0,0" VerticalAlignment="Top" Width="75" Click="BtnCreate_Click"/>
         <TextBox x:Name="TxtBoxSearch" HorizontalAlignment="Left" Height="23" Margin="100,141,0,0" TextWrapping="Wrap" Text="Enter searchphrase" VerticalAlignment="Top" Width="317"/>
         <Image x:Name="image" HorizontalAlignment="Left" Height="100" Margin="1089,119,0,0" VerticalAlignment="Top" Width="100" Source="user.jpg"/>
 
@@ -23,7 +23,7 @@
 
         <ListBox x:Name="LstbxTags" HorizontalAlignment="Left" Height="311" Margin="1281,119,-55,0" VerticalAlignment="Top" Width="140" ToolTip="Tags"/>
 
-        <Frame x:Name="FrmContent" Content="Frame" HorizontalAlignment="Left" Height="561" Margin="707,224,0,0" VerticalAlignment="Top" Width="562" Source="/XBAPLexiconCVDBInterface;component/Page2.xaml"/>
+        <Frame x:Name="FrmContent" Content="Frame" HorizontalAlignment="Left" Height="561" Margin="707,224,0,0" VerticalAlignment="Top" Width="562" Source="/XBAPLexiconCVDBInterface;component/page_default.xaml"/>
         <Button x:Name="BtnUserImage" Content="" HorizontalAlignment="Left" Margin="984,118,0,0" VerticalAlignment="Top" Width="101" Height="101" Background="Transparent" Click="BtnUserImage_Click" BorderBrush="Black" BorderThickness="1" />
         <Image x:Name="userImage" Margin="985,119,0,0" Height="100" Width="100" Source="{Binding PlayPauseImg}"/>
         <TextBox x:Name="txtbxtest" HorizontalAlignment="Left" Height="318" Margin="127,522,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="507"/>
