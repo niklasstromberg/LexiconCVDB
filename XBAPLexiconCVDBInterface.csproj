@@ -53,6 +53,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Dapper">
+      <HintPath>packages\Dapper.1.42\lib\net45\Dapper.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Azure.KeyVault.Core">
       <HintPath>packages\Microsoft.Azure.KeyVault.Core.1.0.0\lib\net40\Microsoft.Azure.KeyVault.Core.dll</HintPath>
     </Reference>
@@ -90,6 +93,7 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Spatial, Version=5.6.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>packages\System.Spatial.5.6.5-beta\lib\net40\System.Spatial.dll</HintPath>
@@ -119,6 +123,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DisplayUser.cs" />
     <Compile Include="Page1.xaml.cs">
       <DependentUpon>Page1.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -180,6 +185,9 @@
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="CVDBUserSchema.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -190,13 +198,13 @@
     <None Include="XBAPLexiconCVDBInterface_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Img\" />
+    <None Include="Resources\userimg01.jpg" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="logo.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="user.jpg" />
+    <EmbeddedResource Include="user.jpg" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="user.png" />
@@ -217,6 +225,9 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Img\user.jpg" />
   </ItemGroup>
   <PropertyGroup>
     <StartArguments />

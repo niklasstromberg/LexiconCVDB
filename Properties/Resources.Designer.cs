@@ -9,6 +9,7 @@
 //------------------------------------------------------------------------------
 
 namespace XBAPLexiconCVDBInterface.Properties {
+    using System;
     
     
     /// <summary>
@@ -37,7 +38,7 @@ namespace XBAPLexiconCVDBInterface.Properties {
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
-                if ((resourceMan == null)) {
+                if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("XBAPLexiconCVDBInterface.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
@@ -56,6 +57,16 @@ namespace XBAPLexiconCVDBInterface.Properties {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap user {
+            get {
+                object obj = ResourceManager.GetObject("user", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
     }

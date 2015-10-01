@@ -20,11 +20,12 @@ namespace XBAPLexiconCVDBInterface
     /// </summary>
     public partial class Page4 : Page
     {
+        int uid;
         
-        public Page4()
+        public Page4(int id)
         {
             InitializeComponent();
-
+            uid = id;
         }
 
         private void BtnPage5_Click(object sender, RoutedEventArgs e)
@@ -41,7 +42,9 @@ namespace XBAPLexiconCVDBInterface
             // Change the page of the frame.
             if (pageFrame != null)
             {
-                pageFrame.Source = new Uri("Page5.xaml", UriKind.Relative);
+                Page5 p5 = new Page5(uid);
+                pageFrame.Navigate(p5);
+                //pageFrame.Source = new Uri("Page5.xaml", UriKind.Relative);
             }
         }
 
@@ -59,7 +62,9 @@ namespace XBAPLexiconCVDBInterface
             // Change the page of the frame.
             if (pageFrame != null)
             {
-                pageFrame.Source = new Uri("Page3.xaml", UriKind.Relative);
+                Page3 p3 = new Page3(uid);
+                pageFrame.Navigate(p3);
+                //pageFrame.Source = new Uri("Page3.xaml", UriKind.Relative);
             }
         }
 

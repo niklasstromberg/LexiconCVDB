@@ -22,6 +22,14 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Data.SqlClient;
 using System.Data;
 using System.Xml;
+using System.IO;
+using System.Xml.Linq;
+using System.Xml.Serialization;
+using Dapper;
+using XBAPLexiconCVDBInterface;
+using System.Configuration;
+using System.Reflection;
+using System.Drawing;
 
 namespace XBAPLexiconCVDBInterface
 {
@@ -30,36 +38,26 @@ namespace XBAPLexiconCVDBInterface
     /// </summary>
     public partial class Page1 : Page
     {
-        //Uri userImage;
-        //string userImageString;
-        int selectedUID;
-        DataSet selectedUser;
-        //UserToDisplay choice = new UserToDisplay();
-        //DataObject datao = new DataObject();
-        //this.dataContext = choice;
 
+        public bool isCreate;
+        public int selectedUID;
+        string conn = ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString;
 
         public Page1()
         {
             InitializeComponent();
 
-            string connString = "Data Source=lexiconitkonsultdbserver.database.windows.net,1433;Initial Catalog=LexiconITKonsultDB;Persist Security Info=True;User ID=lexicondbadmin;Password=Pa$$w0rd";
-            //string connString = Environment.GetEnvironmentVariable("SQLAZURECONNSTR_dbConnectionString");
             if (dgContentList.SelectedIndex < 0)
             {
                 LblPersonalInformation.Visibility = Visibility.Hidden;
             }
 
-
-
-            using (SqlConnection con = new SqlConnection(connString))
+            using (SqlConnection con = new SqlConnection(conn))
             {
                 string SqlQ = string.Format("select user_ID as ID, first_name as Förnamn, last_name as Efternamn from users");
 
                 con.Open();
                 SqlCommand com = new SqlCommand(SqlQ, con);
-                //com.Parameters.AddWithValue("@Forename", txtSearch.Text);
-
                 using (SqlDataAdapter adapter = new SqlDataAdapter(com))
                 {
                     DataTable dt = new DataTable();
@@ -71,51 +69,47 @@ namespace XBAPLexiconCVDBInterface
 
         // Helpermethods
 
-        public async void GetImage(int userID)
+        public async void GetImage()
         {
             if (await (App.Current as App).checkConnection())
             {
-                //if (dgContentList.SelectedItems)
-                //if(userID = 1)
-                //{
-                //userImage = new Uri("user.jpg", UriKind.Absolute);
-                //BtnUserImage.
-                //}
+                string name = "User" + selectedUID + "img";
+                if ((App.Current as App).blobcontainer.Exists())
+                {
+                    CloudBlockBlob blockBlob = (App.Current as App).blobcontainer.GetBlockBlobReference(name);
+                    if (blockBlob.Exists())
+                    {
+                        ImageSource imageSource = new BitmapImage(new Uri(blockBlob.Uri.ToString()));
+                        image.Source = imageSource;
+                    }
+                    else
+                    {
+                        System.Drawing.Bitmap bitmap1 = XBAPLexiconCVDBInterface.Properties.Resources.user;
+                        image.Source = BitmapToImageSource(bitmap1);
+                        //ImageSource imgs = new BitmapImage(new Uri("XBAPLexiconCVDBInterface.Properties.Resources.user.jpg", UriKind.Absolute));
+                        //ImageSource i = new Uri(bitmap1, UriKind.Absolute);
+                        //image.Source = new BitmapImage(new Uri("XBAPLexiconCVDBInterface.Properties.Resources.user.jpg", UriKind.RelativeOrAbsolute));
+                        //image.Source = new BitmapImage(new Uri("XBAPLexiconCVDBInterface.Properties.Resources.user", UriKind.Absolute));
+                    }
+                }
             }
-            //BtnUserImage.Content = userImage;
-            //image.Source = userImage;
-            //BtnUserImage.Foreground = Brushes.AliceBlue;
         }
-
-        //public ImageSource userImage
-        //{
-        //    get
-        //    {
-        //        Uri userImage = new Uri("user.jpg", UriKind.Absolute);
-        //        return userImage;             }
-        //    set
-        //    {
-        //        if (value != null)
-        //        {
-        //            userImage = value;
-        //            //RaisePropertyChanged(() => PlayPauseImg);
-        //        }
-        //    }
-        //}
 
         private async void BtnUserImage_Click(object sender, RoutedEventArgs e)
         {
-            GetImage(1);
-            //var cofd = new CommonOpenFileDialog();
-            //if (cofd.ShowDialog() == CommonFileDialogResult.Ok)
-            //{
-            //    string name = System.IO.Path.GetFileName(cofd.FileName);
-            //    CloudBlockBlob blockBlob = (App.Current as App).blobcontainer.GetBlockBlobReference(name);
-            //    using (var fileStream = System.IO.File.OpenRead(name))
-            //    {
-            //        await blockBlob.UploadFromStreamAsync(fileStream);
-            //    }
-            //}
+            GetImage();
+            var cofd = new CommonOpenFileDialog();
+            if (cofd.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                //string name = System.IO.Path.GetFileName(cofd.FileName);
+                string name = "User" + selectedUID + "img";
+                CloudBlockBlob blockBlob = (App.Current as App).blobcontainer.GetBlockBlobReference(name);
+                blockBlob.Properties.ContentType = "image/jpg";
+                using (var fileStream = System.IO.File.OpenRead(cofd.FileName))
+                {
+                    await blockBlob.UploadFromStreamAsync(fileStream);
+                }
+            }
             //else
             //{
             //    // sätt button background till user.png
@@ -125,96 +119,51 @@ namespace XBAPLexiconCVDBInterface
 
         private void dgContentList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            (App.Current as App).choice = new UserToDisplay();
-            
-            selectedUser = new DataSet();
-            selectedUser.Clear();
+            GetImage();
 
-
+            DisplayUser displayUser = new DisplayUser();
 
             DataGrid dg = sender as DataGrid;
             DataRowView selected = (DataRowView)dg.SelectedItems[0];
             selectedUID = selected.Row.Field<int>(0);
             LblPersonalInformation.Content = (selected.Row.Field<string>("Förnamn")) + " " + (selected.Row.Field<string>("Efternamn"));
 
-
-            string connString = "Data Source=lexiconitkonsultdbserver.database.windows.net,1433;Initial Catalog=LexiconITKonsultDB;Persist Security Info=True;User ID=lexicondbadmin;Password=Pa$$w0rd";
-
-
-            //string connString = Environment.GetEnvironmentVariable("SQLAZURECONNSTR_dbConnectionString");
-
-            string SqlQ = string.Format("procGetUser");// {0}", selectedUID);
-            using (SqlConnection con = new SqlConnection(connString))
+            using (IDbConnection connection = new SqlConnection(conn))
             {
-                using (SqlCommand cmd = new SqlCommand(SqlQ, con))
-                {
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@uID", selectedUID);
-                    con.Open();
-                    //cmd.ExecuteNonQuery();
-                    //cmd.ExecuteReader();
-                    SqlDataAdapter da = new SqlDataAdapter(cmd);
-                    //datao.SetData(selectedUser);
-                    da.SelectCommand = cmd;
-                    da.Fill(selectedUser);
-                    con.Close();
-                }
+                string query = "select first_name, last_name from users where user_id = " + selectedUID;
+                displayUser = connection.Query<DisplayUser>(query).FirstOrDefault();
+                
             }
-            string test1 = selectedUser.GetXmlSchema();
-            string test = selectedUser.GetXml();
+
             LblPersonalInformation.Visibility = Visibility.Visible;
-            using (DataTableReader reader = selectedUser.CreateDataReader())
-            {
-                string test5 = "";
-                string test6 = "";
-                string s = "";
-                while (reader.Read())
-                {
-                    string test3 = reader.GetName(2); // ger Last_Name
-                    int test2 = reader.FieldCount; // ger antal fields
-                    (App.Current as App).choice.user_id = (int)reader.GetValue(0);
-                    (App.Current as App).choice.first_name = reader.GetValue(1).ToString();
-                    (App.Current as App).choice.last_name = reader.GetValue(2).ToString();
-                    (App.Current as App).choice.title = reader.GetValue(3).ToString();
-                    (App.Current as App).choice.date_of_birth = DateTime.Today;//(DateTime)reader.GetValue(4);
-                    //5 adress id
-                    //6 phone
-                    //7 mobile
-                    //8 email
-                    (App.Current as App).choice.swedish = Convert.ToInt32(reader.GetValue(9));
-                    (App.Current as App).choice.english = Convert.ToInt32(reader.GetValue(10));
-                    (App.Current as App).choice.driver = (bool)reader.GetValue(11);
 
-
-                    for (int i = 0; i < test2; i++)
-                    {
-                        s += reader.GetName(i) + ": " + reader.GetValue(i).ToString() + "\n";
-                        //string str = reader.GetValue(2).ToString();
-
-                        //test5 += s;
-                        //test6 += str;
-                    }
-                }
-
-                txtbxtest.Text = (App.Current as App).choice.first_name + " " + (App.Current as App).choice.last_name + "\n\n" + s;
-                //FrmContent.NavigationService.Navigate("/XBAPLexiconCVDBInterface;component/page2.xaml");
-                //Uri p2 = new Uri("/XBAPLexiconCVDBInterface;component/page2.xaml");
-                Uri p2 = new Uri("/XBAPLexiconCVDBInterface;component/page2.xaml", UriKind.Relative);
-                FrmContent.Source = p2;
-                //Frame frmContent = "/XBAPLexiconCVDBInterface;component/page2.xaml";
-            }
-            //txtbxtest.Text = test + test1 + test2.ToString() + test3 + test4;
-            //private void BtnUserImage_Click(object sender, RoutedEventArgs e)
-            //{
-
-            //}
+            Page2 p2 = new Page2(selectedUID);
+            FrmContent.Navigate(p2);
 
         }
 
         private void BtnCreate_Click(object sender, RoutedEventArgs e)
         {
-            Uri p2 = new Uri("/XBAPLexiconCVDBInterface;component/page2.xaml", UriKind.Relative);
-            FrmContent.Source = p2;
+            selectedUID = 0;
+            Page2 p2 = new Page2(selectedUID);
+            FrmContent.Navigate(p2);
+            LblPersonalInformation.Visibility = Visibility.Hidden;
+        }
+
+        BitmapImage BitmapToImageSource(Bitmap bitmap)
+        {
+            using (MemoryStream memory = new MemoryStream())
+            {
+                bitmap.Save(memory, System.Drawing.Imaging.ImageFormat.Bmp);
+                memory.Position = 0;
+                BitmapImage bitmapimage = new BitmapImage();
+                bitmapimage.BeginInit();
+                bitmapimage.StreamSource = memory;
+                bitmapimage.CacheOption = BitmapCacheOption.OnLoad;
+                bitmapimage.EndInit();
+
+                return bitmapimage;
+            }
         }
     }
 }

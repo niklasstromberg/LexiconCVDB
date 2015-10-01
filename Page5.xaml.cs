@@ -20,14 +20,15 @@ namespace XBAPLexiconCVDBInterface
     /// </summary>
     public partial class Page5 : Page
     {
+        int uid;
         public List<string> skillsList = new List<string>();   // list of the chosen skills for the viewed person
         public List<string> tmpList = new List<string> { "c#", "d#", "dyslexia" }; 
         public string skillString = "";
         
-        public Page5()
+        public Page5(int id)
         {
             InitializeComponent();
-
+            uid = id;
             // populate skillsList from database
             PopulateLabel();
             DataContext = skillsList;
@@ -60,7 +61,9 @@ namespace XBAPLexiconCVDBInterface
             // Change the page of the frame.
             if (pageFrame != null)
             {
-                pageFrame.Source = new Uri("Page4.xaml", UriKind.Relative);
+                Page4 p4 = new Page4(uid);
+                pageFrame.Navigate(p4);
+                //pageFrame.Source = new Uri("Page4.xaml", UriKind.Relative);
             }
         }
 

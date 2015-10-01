@@ -20,9 +20,12 @@ namespace XBAPLexiconCVDBInterface
     /// </summary>
     public partial class Page3 : Page
     {
-        public Page3()
+        int uid;
+
+        public Page3(int id)
         {
             InitializeComponent();
+            uid = id;
             //List<Education> educations = new List<Education>();
             //GrdEdu.ItemsSource = educations;
         }
@@ -41,7 +44,9 @@ namespace XBAPLexiconCVDBInterface
             // Change the page of the frame.
             if (pageFrame != null)
             {
-                pageFrame.Source = new Uri("Page2.xaml", UriKind.Relative);
+                Page2 p2 = new Page2(uid);
+                pageFrame.Navigate(p2);
+                //pageFrame.Source = new Uri("Page2.xaml", UriKind.Relative);
             }
         }
 
@@ -59,7 +64,9 @@ namespace XBAPLexiconCVDBInterface
             // Change the page of the frame.
             if (pageFrame != null)
             {
-                pageFrame.Source = new Uri("Page4.xaml", UriKind.Relative);
+                Page4 p4 = new Page4(uid);
+                pageFrame.Navigate(p4);
+                //pageFrame.Source = new Uri("Page4.xaml", UriKind.Relative);
             }
         }
     }

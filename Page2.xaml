@@ -11,7 +11,7 @@
     <Grid>
         <Border BorderBrush="WhiteSmoke" BorderThickness="1" HorizontalAlignment="Left" Height="429" Margin="0,10,0,0" VerticalAlignment="Top" Width="562"/>
         <Button x:Name="BtnPage0" Content="&lt;" HorizontalAlignment="Left" VerticalAlignment="Top" Width="40" Height="40" ToolTip="Previous" FontSize="18" Margin="477,389,0,0" RenderTransformOrigin="0.675,1.275" IsEnabled="False"/>
-        <TextBox x:Name="TxtbxFirstName" HorizontalAlignment="Left" Height="23" Margin="146,15,0,0" TextWrapping="Wrap" Text="First Name" VerticalAlignment="Top" Width="163" ToolTip="First Name"/>
+        <TextBox x:Name="TxtbxFirstName" HorizontalAlignment="Left" Height="23" Margin="146,15,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="163" ToolTip="First Name" BorderBrush="Red" TextChanged="TxtbxFirstName_TextChanged" MouseEnter="TxtbxFirstName_MouseEnter" MouseLeave="TxtbxFirstName_MouseEnter"/>
         <TextBox x:Name="TxtbxLastName" HorizontalAlignment="Left" Height="23" Margin="314,15,0,0" TextWrapping="Wrap" Text="Last Name" VerticalAlignment="Top" Width="173" ToolTip="Last Name"/>
         <TextBox x:Name="TxtbxTitle" HorizontalAlignment="Left" Height="23" Margin="39,15,0,0" TextWrapping="Wrap" Text="Title" VerticalAlignment="Top" Width="102" ToolTip="Title"/>
         <TextBox x:Name="TxtbxStreet01" HorizontalAlignment="Left" Height="23" Margin="146,43,0,0" TextWrapping="Wrap" Text="Street 1" VerticalAlignment="Top" Width="163" ToolTip="Street 1"/>
