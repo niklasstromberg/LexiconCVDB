@@ -1,34 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using Microsoft.Win32;
-using Microsoft.WindowsAzure;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Blob;
-using Microsoft.Azure;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Data.SqlClient;
 using System.Data;
-using System.Xml;
 using System.IO;
-using System.Xml.Linq;
-using System.Xml.Serialization;
 using Dapper;
-using XBAPLexiconCVDBInterface;
 using System.Configuration;
-using System.Reflection;
 using System.Drawing;
 
 namespace XBAPLexiconCVDBInterface
@@ -38,7 +20,7 @@ namespace XBAPLexiconCVDBInterface
     /// </summary>
     public partial class Page1 : Page
     {
-
+        // Variables
         public bool isCreate;
         public int selectedUID;
         string conn = ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString;
@@ -46,11 +28,7 @@ namespace XBAPLexiconCVDBInterface
         public Page1()
         {
             InitializeComponent();
-
-            if (dgContentList.SelectedIndex < 0)
-            {
-                LblPersonalInformation.Visibility = Visibility.Hidden;
-            }
+            ShowHide();
 
             using (SqlConnection con = new SqlConnection(conn))
             {
@@ -67,8 +45,91 @@ namespace XBAPLexiconCVDBInterface
             }
         }
 
+        private void BtnCreate_Click(object sender, RoutedEventArgs e)
+        {
+            selectedUID = 0;
+            Page2 p2 = new Page2(selectedUID);
+            FrmContent.Navigate(p2);
+            LblPersonalInformation.Visibility = Visibility.Hidden;
+        }
+
+        // Lets the user choose and upload an image from file to the blob storage.
+        // The file is saved under the name "User[id]img".
+        // The method then calls the GetImage() method to display the uploaded image.
+        private async void BtnUserImage_Click(object sender, RoutedEventArgs e)
+        {
+            var cofd = new CommonOpenFileDialog();
+            cofd.Filters.Add(new CommonFileDialogFilter("JPEG Files", "*.jpg"));
+            cofd.Filters.Add(new CommonFileDialogFilter("PNG Files", "*.png"));
+
+            if (cofd.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                string name = "User" + selectedUID + "img";
+                CloudBlockBlob blockBlob = (App.Current as App).blobcontainer.GetBlockBlobReference(name);
+                blockBlob.Properties.ContentType = "image/jpg";
+                using (var fileStream = System.IO.File.OpenRead(cofd.FileName))
+                {
+                    await blockBlob.UploadFromStreamAsync(fileStream);
+                    {
+                        GetImage();
+                    }
+                }
+            }
+        }
+        
+
+        private void dgContentList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            GetImage();
+            ShowHide();
+
+            DisplayUser displayUser = new DisplayUser();
+
+            DataGrid dg = sender as DataGrid;
+            DataRowView selected = (DataRowView)dg.SelectedItems[0];
+            selectedUID = selected.Row.Field<int>(0);
+            LblPersonalInformation.Content = (selected.Row.Field<string>("Förnamn")) + " " + (selected.Row.Field<string>("Efternamn"));
+
+            using (IDbConnection connection = new SqlConnection(conn))
+            {
+                string query = "select first_name, last_name from users where user_id = " + selectedUID;
+                displayUser = connection.Query<DisplayUser>(query).FirstOrDefault();
+            }
+            Page2 p2 = new Page2(selectedUID);
+            FrmContent.Navigate(p2);
+        }
+
         // Helpermethods
 
+        // Shows or hides elements on the screen depending on whether or not a
+        // person has been selected in the datagrid.
+        public void ShowHide()
+        {
+            if (dgContentList.SelectedIndex < 1)
+            {
+                LblPersonalInformation.Visibility = Visibility.Hidden;
+                BtnDetails.Visibility = Visibility.Hidden;
+                BtnJournal.Visibility = Visibility.Hidden;
+                BtnLog.Visibility = Visibility.Hidden;
+                BtnUserImage.Visibility = Visibility.Hidden;
+                image.Visibility = Visibility.Hidden;
+                BtnDelete.Visibility = Visibility.Hidden;
+            }
+            else
+            {
+                LblPersonalInformation.Visibility = Visibility.Visible;
+                BtnDetails.Visibility = Visibility.Visible;
+                BtnJournal.Visibility = Visibility.Visible;
+                BtnLog.Visibility = Visibility.Visible;
+                BtnUserImage.Visibility = Visibility.Visible;
+                image.Visibility = Visibility.Visible;
+                BtnDelete.Visibility = Visibility.Visible;
+            }
+        }
+
+        // Gets the users image from the azure blob storage and shows it in the interface
+        // If no image exists in the blob storage for the chosen user, the default image
+        // is displayed
         public async void GetImage()
         {
             if (await (App.Current as App).checkConnection())
@@ -84,72 +145,14 @@ namespace XBAPLexiconCVDBInterface
                     }
                     else
                     {
-                        System.Drawing.Bitmap bitmap1 = XBAPLexiconCVDBInterface.Properties.Resources.user;
-                        image.Source = BitmapToImageSource(bitmap1);
-                        //ImageSource imgs = new BitmapImage(new Uri("XBAPLexiconCVDBInterface.Properties.Resources.user.jpg", UriKind.Absolute));
-                        //ImageSource i = new Uri(bitmap1, UriKind.Absolute);
-                        //image.Source = new BitmapImage(new Uri("XBAPLexiconCVDBInterface.Properties.Resources.user.jpg", UriKind.RelativeOrAbsolute));
-                        //image.Source = new BitmapImage(new Uri("XBAPLexiconCVDBInterface.Properties.Resources.user", UriKind.Absolute));
+                        System.Drawing.Bitmap bitmap = XBAPLexiconCVDBInterface.Properties.Resources.user;
+                        image.Source = BitmapToImageSource(bitmap);
                     }
                 }
             }
         }
 
-        private async void BtnUserImage_Click(object sender, RoutedEventArgs e)
-        {
-            GetImage();
-            var cofd = new CommonOpenFileDialog();
-            if (cofd.ShowDialog() == CommonFileDialogResult.Ok)
-            {
-                //string name = System.IO.Path.GetFileName(cofd.FileName);
-                string name = "User" + selectedUID + "img";
-                CloudBlockBlob blockBlob = (App.Current as App).blobcontainer.GetBlockBlobReference(name);
-                blockBlob.Properties.ContentType = "image/jpg";
-                using (var fileStream = System.IO.File.OpenRead(cofd.FileName))
-                {
-                    await blockBlob.UploadFromStreamAsync(fileStream);
-                }
-            }
-            //else
-            //{
-            //    // sätt button background till user.png
-            //}
-        }
-
-
-        private void dgContentList_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            GetImage();
-
-            DisplayUser displayUser = new DisplayUser();
-
-            DataGrid dg = sender as DataGrid;
-            DataRowView selected = (DataRowView)dg.SelectedItems[0];
-            selectedUID = selected.Row.Field<int>(0);
-            LblPersonalInformation.Content = (selected.Row.Field<string>("Förnamn")) + " " + (selected.Row.Field<string>("Efternamn"));
-
-            using (IDbConnection connection = new SqlConnection(conn))
-            {
-                string query = "select first_name, last_name from users where user_id = " + selectedUID;
-                displayUser = connection.Query<DisplayUser>(query).FirstOrDefault();
-                
-            }
-
-            LblPersonalInformation.Visibility = Visibility.Visible;
-
-            Page2 p2 = new Page2(selectedUID);
-            FrmContent.Navigate(p2);
-
-        }
-
-        private void BtnCreate_Click(object sender, RoutedEventArgs e)
-        {
-            selectedUID = 0;
-            Page2 p2 = new Page2(selectedUID);
-            FrmContent.Navigate(p2);
-            LblPersonalInformation.Visibility = Visibility.Hidden;
-        }
-
+        // Converts parameter bitmap to ImageSource
         BitmapImage BitmapToImageSource(Bitmap bitmap)
         {
             using (MemoryStream memory = new MemoryStream())
