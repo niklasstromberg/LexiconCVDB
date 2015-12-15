@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace XBAPLexiconCVDBInterface
+namespace XBAPLexiconCVDBInterface.Views
 {
     /// <summary>
     /// Interaction logic for Page4.xaml

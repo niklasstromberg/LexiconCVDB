@@ -6,31 +6,26 @@ namespace XBAPLexiconCVDBInterface
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.Spatial;
 
-    public partial class Adresses
+    public partial class Locations
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Adresses()
+        public Locations()
         {
-            Users = new HashSet<Users>();
+            Lexicon_Offices = new HashSet<Lexicon_Offices>();
+            User_LOC_REL = new HashSet<User_LOC_REL>();
         }
 
         [Key]
-        public int Adress_ID { get; set; }
+        public int Location_ID { get; set; }
 
         [Required]
         [StringLength(50)]
-        public string Street01 { get; set; }
-
-        [StringLength(50)]
-        public string Street02 { get; set; }
-
-        public int Zipcode { get; set; }
-
-        [Required]
-        [StringLength(50)]
-        public string City { get; set; }
+        public string Location_Name { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Users> Users { get; set; }
+        public virtual ICollection<Lexicon_Offices> Lexicon_Offices { get; set; }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<User_LOC_REL> User_LOC_REL { get; set; }
     }
 }

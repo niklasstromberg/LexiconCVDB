@@ -1,4 +1,4 @@
-﻿<Page x:Class="XBAPLexiconCVDBInterface.Page5"
+﻿<Page x:Class="XBAPLexiconCVDBInterface.Views.Page5"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
