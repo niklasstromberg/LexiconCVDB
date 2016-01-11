@@ -58,7 +58,7 @@ namespace XBAPLexiconCVDBInterface
 
             csa = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("stacConnectionString"));
             cbc = csa.CreateCloudBlobClient();
-            blobcontainer = cbc.GetContainerReference("lexiconitkonsultsacontainer");
+            blobcontainer = cbc.GetContainerReference("lexiconblobs");
             bro.RetryPolicy = new LinearRetry(TimeSpan.FromSeconds(2), 3);
             // If connection is established
             if (await checkConnection())

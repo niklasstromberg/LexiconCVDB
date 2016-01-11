@@ -32,7 +32,7 @@ namespace XBAPLexiconCVDBInterface.Extentionmethods
             }
         }
 
-        public static bool StingIsInt(this string str)
+        public static bool StringIsInt(this string str)
         {
             int i;
             if(Int32.TryParse(str, out i))
@@ -67,6 +67,46 @@ namespace XBAPLexiconCVDBInterface.Extentionmethods
             }
             string tmp = str.Substring(0, 1);
             return str.Remove(0, 1).Insert(0, tmp.ToUpper());
+        }
+
+        public static string GetLexiconHandle(this Journals j)
+        {
+            using (var db = new CVDBContext())
+            {
+                var query = from lh in db.Lexicon_Handles
+                            where lh.Lexicon_Handle_ID == j.Lexicon_Handle_ID
+                            select lh;
+                var obj = query.FirstOrDefault();
+                return obj.First_Name.CapitalizeFirst() + " " + obj.Last_Name.CapitalizeFirst();
+            }
+        }
+
+        public static string GetLexiconHandle(this Logs l)
+        {
+            using (var db = new CVDBContext())
+            {
+                var query = from lh in db.Lexicon_Handles
+                            where lh.Lexicon_Handle_ID == l.Lexicon_Handle_ID
+                            select lh;
+                var obj = query.FirstOrDefault();
+                return obj.First_Name.CapitalizeFirst() + " " + obj.Last_Name.CapitalizeFirst();
+            }
+        }
+
+        public static int GetEduID(this Educations e)
+        {
+            using (var db = new CVDBContext())
+            {
+                var query = from edu in db.Educations
+                            where edu.Year == e.Year && edu.School == e.School && edu.Course == e.Course && edu.Degree == e.Degree && edu.Notes == e.Notes
+                            select edu;
+                if (query.Count() > 1)
+                {
+                    Educations newEdu = query.FirstOrDefault();
+                    return newEdu.EDU_ID;
+                }
+                return 0;
+            }
         }
 
     }

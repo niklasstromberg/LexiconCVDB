@@ -13,16 +13,16 @@
         <Border BorderBrush="WhiteSmoke" BorderThickness="1" HorizontalAlignment="Left" Height="429" Margin="0,10,0,0" VerticalAlignment="Top" Width="562"/>
         <Button x:Name="BtnPage2" Content="&lt;" HorizontalAlignment="Left" VerticalAlignment="Top" Width="40" Height="40" ToolTip="Education" FontSize="18" Margin="477,389,0,0" RenderTransformOrigin="0.675,1.275" Click="BtnPage3_Click"/>
         <Button x:Name="BtnPage4" Content="&gt;" HorizontalAlignment="Left" Margin="522,389,0,0" VerticalAlignment="Top" Width="40" Height="40" ToolTip="Skills" FontSize="18" Click="BtnPage5_Click"/>
-        <DataGrid x:Name="GrdEmpHis" HorizontalAlignment="Left" Margin="39,15,0,0" VerticalAlignment="Top" Height="139" Width="448" ToolTip="Education"/>
-        <TextBox x:Name="TxtbxCompany" HorizontalAlignment="Left" Height="23" Margin="39,197,0,0" TextWrapping="Wrap" Text="Company" VerticalAlignment="Top" Width="120" ToolTip="Company"/>
-        <TextBox x:Name="TxtbxDepartment" HorizontalAlignment="Left" Height="23" Margin="234,197,0,0" TextWrapping="Wrap" Text="Department" VerticalAlignment="Top" Width="120" ToolTip="Department"/>
-        <TextBox x:Name="TxtbxPosition" HorizontalAlignment="Left" Height="23" Margin="39,225,0,0" TextWrapping="Wrap" Text="Position" VerticalAlignment="Top" Width="120" ToolTip="Position"/>
-        <TextBox x:Name="TxtbxTitle" HorizontalAlignment="Left" Height="23" Margin="234,225,0,0" TextWrapping="Wrap" Text="Title" VerticalAlignment="Top" Width="120" ToolTip="Title"/>
+        <DataGrid x:Name="GrdEmpHis" HorizontalAlignment="Left" Margin="39,15,0,0" VerticalAlignment="Top" Height="139" Width="448" ToolTip="Education" SelectionChanged="GrdEmpHis_SelectionChanged"/>
+        <TextBox x:Name="TxtbxCompany" HorizontalAlignment="Left" Height="23" Margin="39,197,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" ToolTip="Company"/>
+        <TextBox x:Name="TxtbxDepartment" HorizontalAlignment="Left" Height="23" Margin="234,197,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" ToolTip="Department"/>
+        <TextBox x:Name="TxtbxPosition" HorizontalAlignment="Left" Height="23" Margin="39,225,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" ToolTip="Position"/>
+        <TextBox x:Name="TxtbxTitle" HorizontalAlignment="Left" Height="23" Margin="234,225,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" ToolTip="Title"/>
         <DatePicker x:Name="DPFrom" HorizontalAlignment="Left" Margin="39,253,0,0" VerticalAlignment="Top" Width="120" Text="From Date" FirstDayOfWeek="Monday" ToolTip="From Date"/>
         <DatePicker HorizontalAlignment="Left" Margin="234,253,0,0" VerticalAlignment="Top" Width="120" FirstDayOfWeek="Monday" ToolTip="End Date"/>
         <CheckBox x:Name="ChkbxCurrentEMP" Content="Currently employed" HorizontalAlignment="Left" Margin="359,258,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="TxtbxNotes" HorizontalAlignment="Left" Height="120" Margin="39,282,0,0" TextWrapping="Wrap" Text="Notes" VerticalAlignment="Top" Width="315" ToolTip="Notes"/>
-        <Button x:Name="BtnAddReference" Content="Add Reference" HorizontalAlignment="Left" Margin="397,196,0,0" VerticalAlignment="Top" Width="90" Click="BtnAddReference_Click"/>
+        <TextBox x:Name="TxtbxNotes" HorizontalAlignment="Left" Height="120" Margin="39,282,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="315" ToolTip="Notes"/>
+        <Button x:Name="BtnAddReference" Content="Reference" HorizontalAlignment="Left" Margin="397,196,0,0" VerticalAlignment="Top" Width="90" Click="BtnReference_Click"/>
         <Popup x:Name="PopupAddRef"  IsOpen="false"  Height="300" Width="300" PopupAnimation="Fade" PlacementTarget="{Binding ElementName=BtnAddReference}" AllowsTransparency="True" >
             <StackPanel x:Name="StkpnlPopup">
                 <StackPanel.Background>
@@ -31,13 +31,13 @@
                         <GradientStop Color="White" Offset="1"/>
                     </LinearGradientBrush>
                 </StackPanel.Background>
-                <TextBox x:Name="TxtbxFirstNameRef" TextWrapping="Wrap" Margin="7" ToolTip="First Name" Height="23" Text="First Name"/>
-                <TextBox x:Name="TxtbxLastNameRef" Height="23" TextWrapping="Wrap" Text="Last Name" Margin="7" ToolTip="Last Name"/>
-                <TextBox x:Name="TxtbxTitleRef" Height="23" TextWrapping="Wrap" Text="Title" Margin="7" ToolTip="Title"/>
-                <TextBox x:Name="TxtbxCompanyRef" Height="23" TextWrapping="Wrap" Text="Company" Margin="7" ToolTip="Company"/>
-                <TextBox x:Name="TxtbxPhoneRef" Height="23" TextWrapping="Wrap" Text="Phone number" Margin="7" ToolTip="Phone number"/>
-                <TextBox x:Name="TxtbxMobileRef" Height="23" TextWrapping="Wrap" Text="Mobile phone" ToolTip="Mobile Phone" Margin="7"/>
-                <TextBox x:Name="TxtbxEmailRef" Height="23" TextWrapping="Wrap" Text="Email adress" ToolTip="Email adress" Margin="7"/>
+                <TextBox x:Name="TxtbxFirstNameRef" TextWrapping="Wrap" Margin="7" ToolTip="First Name" Height="23" Text=""/>
+                <TextBox x:Name="TxtbxLastNameRef" Height="23" TextWrapping="Wrap" Text="" Margin="7" ToolTip="Last Name"/>
+                <TextBox x:Name="TxtbxTitleRef" Height="23" TextWrapping="Wrap" Text="" Margin="7" ToolTip="Title"/>
+                <TextBox x:Name="TxtbxCompanyRef" Height="23" TextWrapping="Wrap" Text="" Margin="7" ToolTip="Company"/>
+                <TextBox x:Name="TxtbxPhoneRef" Height="23" TextWrapping="Wrap" Text="" Margin="7" ToolTip="Phone number"/>
+                <TextBox x:Name="TxtbxMobileRef" Height="23" TextWrapping="Wrap" Text="" ToolTip="Mobile Phone" Margin="7"/>
+                <TextBox x:Name="TxtbxEmailRef" Height="23" TextWrapping="Wrap" Text="" ToolTip="Email adress" Margin="7" TextChanged="TxtbxEmailRef_TextChanged"/>
                 <Button x:Name="BtnAddRef" Content="Add Reference" IsDefault="False" Margin="21,7" Click="BtnAddRef_Click" />
             </StackPanel>
 
@@ -46,5 +46,6 @@
         </Popup>
 
         <Label x:Name="LblPage" Content="Employment History" HorizontalAlignment="Left" Margin="446,358,0,0" VerticalAlignment="Top" Width="125"/>
+        <Button x:Name="BtnSaveExp" Content="Add Experience" HorizontalAlignment="Left" Margin="396,282,0,0" VerticalAlignment="Top" Width="91" Click="BtnSaveExp_Click"/>
     </Grid>
 </Page>

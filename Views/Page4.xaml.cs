@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using XBAPLexiconCVDBInterface.Extentionmethods;
 
 namespace XBAPLexiconCVDBInterface.Views
 {
@@ -21,7 +23,7 @@ namespace XBAPLexiconCVDBInterface.Views
     public partial class Page4 : Page
     {
         int uid;
-        
+
         public Page4(int id)
         {
             InitializeComponent();
@@ -68,29 +70,153 @@ namespace XBAPLexiconCVDBInterface.Views
             }
         }
 
-        private void BtnAddReference_Click(object sender, RoutedEventArgs e)
+
+        private void BtnReference_Click(object sender, RoutedEventArgs e)
         {
-            //if (!PopupAddRef.IsOpen)
-            //{
-            //    PopupAddRef.IsOpen = true;
-            //}
-            //else
-            //{
-            //    PopupAddRef.IsOpen = false;
-            //}
+            ClearFields();
             PopupAddRef.IsOpen = PopupAddRef.IsOpen == true ? false : true;
-            // bygg en array eller JSON-objekt med ett reference-objekt i.
-            // Spara till databasen, behåll REF_ID för referens till
-            // när vi sparar employment history-posten
+            FillRef(refID);
         }
 
         private void BtnAddRef_Click(object sender, RoutedEventArgs e)
         {
-            // Spara reference till databasen och stäng popup
+            if (TxtbxCompanyRef.Text.Length > 0)
+            {
+                SaveCompany(TxtbxCompanyRef.Text);
+            }
+            using (var db = new CVDBContext())
+            {
+                User_References ur = new User_References
+                {
+                    Company_ID = coID,
+                    First_Name = TxtbxFirstNameRef.Text,
+                    Last_Name = TxtbxLastNameRef.Text,
+                    Title = TxtbxTitleRef.Text,
+                    Phone = TxtbxPhoneRef.Text,
+                    Mobile = TxtbxMobileRef.Text,
+                    Email = TxtbxEmailRef.Text
+                };
+                db.User_References.Add(ur);
+                db.Entry(ur).State = EntityState.Added;
+                db.SaveChanges();
+            }
             PopupAddRef.IsOpen = false;
         }
 
+        int coID;
+        private async void SaveCompany(string str)
+        {
+            using (var db = new CVDBContext())
+            {
+                Companies co = db.Companies.Find(GetCompanyID(str));
+                //var query = from co in db.Companies
+                //            where co.Company_Name == str
+                //            select co;
+                if (co == null)
+                //if (query.Count() < 1)
+                {
+                    co = new Companies
+                    {
+                        Company_Name = TxtbxCompanyRef.Text
+                    };
+                    db.Companies.Add(co);
+                    db.Entry(co).State = EntityState.Added;
+                    await db.SaveChangesAsync();
+                    coID = GetCompanyID(co.Company_Name);
+                }
+                else
+                {
+                    coID = co.Company_ID;
+                }
+            }
+        }
 
+        private int GetCompanyID(string str)
+        {
+            using (var db = new CVDBContext())
+            {
+                var query = from comp in db.Companies
+                            where comp.Company_Name == str
+                            select comp;
+                if (query.Count() == 1)
+                {
+                    return query.FirstOrDefault().Company_ID;
+                }
+                else return 0;
+            }
+        }
+
+        private void FillGrdRef()
+        {
+            using (var db = new CVDBContext())
+            {
+                var query = from exp in db.Employment_Histories
+                            join com in db.Companies on exp.Company_ID equals com.Company_ID
+                            join refe in db.User_References on exp.REF_ID equals refe.REF_ID
+                            select new { exp.EMP_HIS_ID, exp.From_Date, exp.Until_Date, com.Company_Name, exp.Position, refe.First_Name, refe.Last_Name };
+                GrdEmpHis.ItemsSource = query.OrderBy(x => x.From_Date).ToList();
+            }
+        }
+
+        private void FillRef(int id)
+        {
+            using (var db = new CVDBContext())
+            {
+                User_References ur = db.User_References.Find(id);
+                TxtbxFirstNameRef.Text = ur.First_Name;
+                TxtbxLastNameRef.Text = ur.Last_Name;
+                TxtbxTitleRef.Text = ur.Title;
+                if (ur.Company_ID != null)
+                    TxtbxCompanyRef.Text = GetCompanyName((int)ur.Company_ID);
+                TxtbxPhoneRef.Text = ur.Phone;
+                TxtbxMobileRef.Text = ur.Mobile;
+                TxtbxEmailRef.Text = ur.Email;
+            }
+        }
+
+        private string GetCompanyName(int id)
+        {
+            using (var db = new CVDBContext())
+            {
+                Companies c = db.Companies.Find(id);
+                return c.Company_Name;
+            }
+        }
+
+        private void ClearFields()
+        {
+            TxtbxCompany.Text = "";
+            TxtbxDepartment.Text = "";
+            TxtbxNotes.Text = "";
+            TxtbxPosition.Text = "";
+            TxtbxTitle.Text = "";
+        }
+
+        private void TxtbxEmailRef_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if(TxtbxEmailRef.Text.EmailWithAt())
+            {
+                TxtbxEmailRef.BorderBrush = Brushes.Green;
+                BtnAddRef.IsEnabled = true;
+            }
+            else
+            {
+                TxtbxEmailRef.BorderBrush = Brushes.Red;
+                BtnAddRef.IsEnabled = false;
+            }
+        }
+
+        private void BtnSaveExp_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        int refID;
+        int emp_hisID;
+        private void GrdEmpHis_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
 
     }
 }

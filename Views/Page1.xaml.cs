@@ -17,6 +17,7 @@ using XBAPLexiconCVDBInterface.Views;
 using System.Data.Entity;
 using XBAPLexiconCVDBInterface.Extentionmethods;
 using System.Collections.Generic;
+using XBAPLexiconCVDBInterface.ViewModels;
 
 namespace XBAPLexiconCVDBInterface.Views
 {
@@ -28,6 +29,7 @@ namespace XBAPLexiconCVDBInterface.Views
         // Variables
         public bool isCreate;
         public int selectedUID = -1;
+        public int loggedInAs = 1;
         string conn = ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString;
 
         public Page1()
@@ -205,6 +207,8 @@ namespace XBAPLexiconCVDBInterface.Views
             PopupJournal.IsOpen = false;
             PopupDetails.IsOpen = false;
             PopupDelete.IsOpen = true;
+            PopupLog.IsOpen = false;
+            PopupEditLog.IsOpen = false;
         }
 
         private void BtnSaveDetails_Click(object sender, RoutedEventArgs e)
@@ -233,6 +237,8 @@ namespace XBAPLexiconCVDBInterface.Views
             PopupEditJournal.IsOpen = false;
             PopupJournal.IsOpen = false;
             PopupDelete.IsOpen = false;
+            PopupEditLog.IsOpen = false;
+            PopupLog.IsOpen = false;
             PopupDetails.IsOpen = PopupDetails.IsOpen == true ? false : true;
         }
 
@@ -283,54 +289,90 @@ namespace XBAPLexiconCVDBInterface.Views
             TxtDetailsSalary.Text = AddSEK(TxtDetailsSalary.Text);
         }
 
+        int JournalID;
         private void DGJournals_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            using (var db = new CVDBContext())
+            if (DGJournals.SelectedIndex >= 0)
             {
-                var query = from j in db.Journals
-                            where j.User_ID == selectedUID
-                            select j;
+                var obj = DGJournals.SelectedItem;
+                System.Type type = obj.GetType();
+                JournalID = (int)type.GetProperty("Journal_ID").GetValue(obj, null);
+
+                using (var db = new CVDBContext())
+                {
+                    Journals journal = db.Journals.Find(JournalID);
+
+                    LblJournalDate.Content = journal.Created;
+                    LblJournalWho.Content = journal.GetLexiconHandle();
+                    TxtBxJournalEntry.Text = journal.Notes;
+                }
+                BtnNewJournal.Content = "Close";
+                PopupEditJournal.IsOpen = true;
             }
-            PopupEditJournal.IsOpen = true;
         }
 
         private void BtnJournal_Click(object sender, RoutedEventArgs e)
         {
+            BtnNewJournal.Content = "New Entry";
             PopupJournal.IsOpen = PopupJournal.IsOpen == true ? false : true;
             PopupDetails.IsOpen = false;
             PopupDelete.IsOpen = false;
+            PopupLog.IsOpen = false;
+            PopupEditLog.IsOpen = false;
             PopupEditJournal.IsOpen = false;
             //DGJournals.Items.Clear();
+            FillJournals();
 
-            using (var db = new CVDBContext())
-            {
-                var query = from j in db.Journals
-                            where j.User_ID == selectedUID
-                            select new { Journal_ID = j.Journal_ID, Created = j.Created, Notes = j.Notes };
-                var tmp = query.ToList();
-                DGJournals.ItemsSource = tmp;
-                //foreach (var v in tmp)
-                //{
-                //    v.Created = v.Created.Date;
-                //    v.Notes = v.Notes.GetFirst25() + "...";
-                //}
-                //var query2 = from j2 in tmp
-                //             select new { Date = j2.Created.ToShortDateString(), Journal = j2.Notes };
-                //var results = query2.ToList();
-                //DGJournals.ItemsSource = tmp;
-            }
+            //using (var db = new CVDBContext())
+            //{
+            //    var query = from j in db.Journals
+            //                where j.User_ID == selectedUID
+            //                select new { Journal_ID = j.Journal_ID, Created = j.Created, Notes = j.Notes };
+            //    var tmp = query.ToList();
+            //    DGJournals.ItemsSource = tmp;
+            //    //foreach (var v in tmp)
+            //    //{
+            //    //    v.Created = v.Created.Date;
+            //    //    v.Notes = v.Notes.GetFirst25() + "...";
+            //    //}
+            //    //var query2 = from j2 in tmp
+            //    //             select new { Journal_ID = j2.Journal_ID, Date = j2.Created.Date, Journal = j2.Notes.GetFirst25() };
+            //    //var results = query2.ToList();
+            //    //DGJournals.ItemsSource = results;
+            //}
         }
 
         private void BtnNewJournal_Click(object sender, RoutedEventArgs e)
         {
             PopupEditJournal.IsOpen = PopupEditJournal.IsOpen == true ? false : true;
             BtnNewJournal.Content = PopupEditJournal.IsOpen == true ? "Close" : "New Entry";
+            DGJournals.SelectedIndex = -1;
+            DGJournals.SelectedItem = null;
             LblJournalDate.Content = DateTime.Now;
+            string lhName = "";
+            using (var db = new CVDBContext())
+            {
+                var query = from lh in db.Lexicon_Handles
+                            where lh.Lexicon_Handle_ID == 1
+                            select lh.First_Name + " " + lh.Last_Name;
+                lhName = query.FirstOrDefault();
+            }
+            LblJournalWho.Content = lhName;
+            TxtBxJournalEntry.Text = "";
+            BtnJournalDelete.IsEnabled = false;
         }
 
         private void BtnJournalDelete_Click(object sender, RoutedEventArgs e)
         {
-
+            using (var db = new CVDBContext())
+            {
+                Journals JournalToDelete = db.Journals.Find(JournalID);
+                db.Journals.Remove(JournalToDelete);
+                db.SaveChanges();
+            }
+            PopupEditJournal.IsOpen = false;
+            BtnNewJournal.Content = "New Entry";
+            FillJournals();
         }
 
         private void BtnJournalSave_Click(object sender, RoutedEventArgs e)
@@ -343,24 +385,187 @@ namespace XBAPLexiconCVDBInterface.Views
                     {
                         Created = DateTime.Now,
                         User_ID = selectedUID,
-                        Notes = TxtBxJournalEntry.Text
+                        Notes = TxtBxJournalEntry.Text,
+                        Lexicon_Handle_ID = 1
                     };
                     db.Journals.Add(j);
                     db.Entry(j).State = EntityState.Added;
                 }
                 else
                 {
-                    Journals j = new Journals
-                    {
-                        Notes = TxtBxJournalEntry.Text
-                    };
+                    Journals j = db.Journals.Find(JournalID);
+
+                    j.Notes = TxtBxJournalEntry.Text;
+
                     db.Entry(j).State = EntityState.Modified;
                 }
                 db.SaveChanges();
             }
             PopupEditJournal.IsOpen = false;
-            PopupJournal.IsOpen = false;
+            PopupJournal.IsOpen = true;
+            BtnNewJournal.Content = "New Entry";
+            FillJournals();
         }
+
+        public void FillJournals()
+        {
+            using (var db = new CVDBContext())
+            {
+                var query = from j in db.Journals
+                            where j.User_ID == selectedUID
+                            select new { Journal_ID = j.Journal_ID, Created = j.Created, Notes = j.Notes };
+                var tmp = query.ToList();
+                DGJournals.ItemsSource = tmp;
+            }
+        }
+
+        public void FillLogs()
+        {
+            using (var db = new CVDBContext())
+            {
+                var query = from l in db.Logs
+                            join e in db.Log_Events on l.Event_ID equals e.Event_ID
+                            where l.User_ID == selectedUID
+                            select new { Log_ID = l.Log_ID, Created = l.Created, Event = e.Event_Name };
+                var tmp = query.ToList();
+                DGLogs.ItemsSource = tmp;
+            }
+        }
+
+        private void BtnNewLog_Click(object sender, RoutedEventArgs e)
+        {
+            PopupEditLog.IsOpen = PopupEditLog.IsOpen == true ? false : true;
+            BtnNewLog.Content = PopupEditLog.IsOpen == true ? "Close" : "New Log";
+            //DGLogs.SelectedIndex = -1;
+            //DGLogs.SelectedItem = null;
+            LblLogDate.Content = DateTime.Now;
+            string lhName = "";
+            using (var db = new CVDBContext())
+            {
+                var query = from lh in db.Lexicon_Handles
+                            where lh.Lexicon_Handle_ID == 1
+                            select lh.First_Name + " " + lh.Last_Name;
+                lhName = query.FirstOrDefault();
+            }
+            LblLogWho.Content = lhName;
+            TxtBxLogEntry.Text = "";
+            BtnLogDelete.IsEnabled = false;
+            using (var db = new CVDBContext())
+            {
+                var query = from le in db.Log_Events
+                            select le;
+                foreach (Log_Events le in query)
+                {
+                    if (!CBLogEvents.Items.Contains(le.Event_Name))
+                        CBLogEvents.Items.Add(le.Event_Name);
+                    if (!eventlist.ContainsKey(le.Event_ID))
+                    {
+                        eventlist.Add(le.Event_ID, le.Event_Name);
+                    }
+                }
+            }
+        }
+
+        int LogID;
+        private void DGLogs_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (DGLogs.SelectedIndex >= 0)
+            {
+                var obj = DGLogs.SelectedItem;
+                System.Type type = obj.GetType();
+                LogID = (int)type.GetProperty("Log_ID").GetValue(obj, null);
+                PopupEditLog.IsOpen = true;
+                BtnNewLog.Content = "Close";
+                using (var db = new CVDBContext())
+                {
+                    Logs log = db.Logs.Find(LogID);
+                    var query = from ev in db.Log_Events
+                                where ev.Event_ID == log.Event_ID
+                                select ev.Event_Name;
+                    string tmp = query.FirstOrDefault();
+                    LblLogDate.Content = log.Created;
+                    LblLogWho.Content = log.GetLexiconHandle();
+                    CBLogEvents.SelectedItem = tmp;
+                    TxtBxLogEntry.Text = log.Notes;
+                }
+                BtnLogDelete.IsEnabled = true;
+            }
+
+        }
+
+        private void BtnLogDelete_Click(object sender, RoutedEventArgs e)
+        {
+            using (var db = new CVDBContext())
+            {
+                Logs LogToDelete = db.Logs.Find(LogID);
+                db.Logs.Remove(LogToDelete);
+                db.SaveChanges();
+            }
+
+            PopupEditLog.IsOpen = false;
+            BtnNewLog.Content = "New Log";
+            FillLogs();
+        }
+
+        private void BtnLogSave_Click(object sender, RoutedEventArgs e)
+        {
+            using (var db = new CVDBContext())
+            {
+                if (LogID < 1)
+                {
+                    Logs newLog = new Logs
+                    {
+                        Event_ID = getEventID(CBLogEvents.SelectedValue.ToString()),
+                        Lexicon_Handle_ID = 1,
+                        Created = DateTime.Now,
+                        User_ID = selectedUID,
+                        Notes = TxtBxLogEntry.Text
+                    };
+                    db.Logs.Add(newLog);
+                    db.Entry(newLog).State = EntityState.Added;
+                }
+                else
+                {
+                    Logs logToUpdate = db.Logs.Find(LogID);
+                    logToUpdate.Notes = TxtBxLogEntry.Text;
+                    db.Entry(logToUpdate).State = EntityState.Modified;
+                }
+                db.SaveChanges();
+            }
+            PopupEditLog.IsOpen = false;
+            BtnNewLog.Content = "New Log";
+            FillLogs();
+        }
+
+        private void CBLogEvents_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            //var obj = DGLogs.SelectedItem;
+            //System.Type type = obj.GetType();
+            //LogID = (int)type.GetProperty("Log_ID").GetValue(obj, null);
+        }
+
+        Dictionary<int, string> eventlist = new Dictionary<int, string>();
+        private void BtnLog_Click(object sender, RoutedEventArgs e)
+        {
+            FillLogs();
+            PopupLog.IsOpen = PopupLog.IsOpen == true ? false : true;
+            PopupEditLog.IsOpen = false;
+            PopupEditJournal.IsOpen = false;
+            PopupJournal.IsOpen = false;
+            PopupDetails.IsOpen = false;
+            PopupDelete.IsOpen = false;
+            BtnNewLog.Content = "New Log";
+
+
+        }
+
+        private int getEventID(string s)
+        {
+            var v = eventlist.Single(x => x.Value == s);
+            return v.Key;
+        }
+
+
 
 
     }

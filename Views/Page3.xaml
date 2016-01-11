@@ -13,14 +13,22 @@
         <Border BorderBrush="WhiteSmoke" BorderThickness="1" HorizontalAlignment="Left" Height="429" Margin="0,10,0,0" VerticalAlignment="Top" Width="562"/>
         <Button x:Name="BtnPage2" Content="&lt;" HorizontalAlignment="Left" VerticalAlignment="Top" Width="40" Height="40" ToolTip="Personal Information" FontSize="18" Margin="477,389,0,0" RenderTransformOrigin="0.675,1.275" Click="BtnPage2_Click"/>
         <Button x:Name="BtnPage4" Content="&gt;" HorizontalAlignment="Left" Margin="522,389,0,0" VerticalAlignment="Top" Width="40" Height="40" ToolTip="Employment History" FontSize="18" Click="BtnPage4_Click"/>
-        <DataGrid x:Name="GrdEdu" HorizontalAlignment="Left" Margin="39,15,0,0" VerticalAlignment="Top" Height="139" Width="448" ToolTip="Education"/>
+        <DataGrid x:Name="GrdEdu" HorizontalAlignment="Left" Margin="39,15,0,0" VerticalAlignment="Top" Height="139" Width="448" ToolTip="Education" SelectionChanged="GrdEdu_SelectionChanged" AutoGenerateColumns="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Edu_ID" Visibility="Collapsed" Binding="{Binding EDU_ID}"/>
+                <DataGridTextColumn Header="School" Binding="{Binding School}"/>
+                <DataGridTextColumn Header="Course" Binding="{Binding Course}" />
+                <DataGridTextColumn Header="Degree" Binding="{Binding Degree}" />
+                <DataGridTextColumn Header="Year" Binding="{Binding Year}"/>
+            </DataGrid.Columns>
+        </DataGrid>
         <Label x:Name="LblPage" Content="Education" HorizontalAlignment="Left" Margin="502,358,0,0" VerticalAlignment="Top" Width="70"/>
-        <TextBox x:Name="TxtbxSchool" HorizontalAlignment="Left" Height="23" Margin="39,197,0,0" TextWrapping="Wrap" Text="School" VerticalAlignment="Top" Width="120" ToolTip="School"/>
-        <TextBox x:Name="TxtbxDegree" HorizontalAlignment="Left" Height="23" Margin="234,197,0,0" TextWrapping="Wrap" Text="Degree" VerticalAlignment="Top" Width="120" ToolTip="Degree"/>
-        <TextBox x:Name="TxtbxCourse" HorizontalAlignment="Left" Height="23" Margin="39,225,0,0" TextWrapping="Wrap" Text="Course/certificate" VerticalAlignment="Top" Width="120" ToolTip="Course/certificate"/>
-        <TextBox x:Name="TxtbxYear" HorizontalAlignment="Left" Height="23" Margin="234,225,0,0" TextWrapping="Wrap" Text="Year" VerticalAlignment="Top" Width="120" ToolTip="Year"/>
-        <TextBox x:Name="TxtbxNotes" HorizontalAlignment="Left" Height="120" Margin="39,253,0,0" TextWrapping="Wrap" Text="Notes" VerticalAlignment="Top" Width="315" ToolTip="Notes"/>
-        <Button x:Name="BtnAddEdu" Content="Add" HorizontalAlignment="Left" Margin="412,197,0,0" VerticalAlignment="Top" Width="75"/>
-        <Button x:Name="BtnDeleteEdu" Content="Delete" HorizontalAlignment="Left" Margin="412,222,0,0" VerticalAlignment="Top" Width="75"/>
+        <TextBox x:Name="TxtbxSchool" HorizontalAlignment="Left" Height="23" Margin="39,197,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" ToolTip="School"/>
+        <TextBox x:Name="TxtbxDegree" HorizontalAlignment="Left" Height="23" Margin="234,197,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" ToolTip="Degree"/>
+        <TextBox x:Name="TxtbxCourse" HorizontalAlignment="Left" Height="23" Margin="39,225,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" ToolTip="Course/certificate"/>
+        <TextBox x:Name="TxtbxYear" HorizontalAlignment="Left" Height="23" Margin="234,225,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" ToolTip="Year" TextChanged="TxtbxYear_TextChanged"/>
+        <TextBox x:Name="TxtbxNotes" HorizontalAlignment="Left" Height="120" Margin="39,253,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="315" ToolTip="Notes"/>
+        <Button x:Name="BtnAddEdu" Content="Add" HorizontalAlignment="Left" Margin="412,197,0,0" VerticalAlignment="Top" Width="75" Click="BtnAddEdu_Click"/>
+        <Button x:Name="BtnDeleteEdu" Content="Delete" HorizontalAlignment="Left" Margin="412,222,0,0" VerticalAlignment="Top" Width="75" Click="BtnDeleteEdu_Click"/>
     </Grid>
 </Page>
