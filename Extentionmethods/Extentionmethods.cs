@@ -93,14 +93,14 @@ namespace XBAPLexiconCVDBInterface.Extentionmethods
             }
         }
 
-        public static int GetEduID(this Educations e)
+        public static int GetEduID(this Educations e)   
         {
             using (var db = new CVDBContext())
             {
                 var query = from edu in db.Educations
                             where edu.Year == e.Year && edu.School == e.School && edu.Course == e.Course && edu.Degree == e.Degree && edu.Notes == e.Notes
                             select edu;
-                if (query.Count() > 1)
+                if (query.Count() > 0)
                 {
                     Educations newEdu = query.FirstOrDefault();
                     return newEdu.EDU_ID;

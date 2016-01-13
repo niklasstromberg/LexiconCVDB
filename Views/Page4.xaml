@@ -19,7 +19,7 @@
         <TextBox x:Name="TxtbxPosition" HorizontalAlignment="Left" Height="23" Margin="39,225,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" ToolTip="Position"/>
         <TextBox x:Name="TxtbxTitle" HorizontalAlignment="Left" Height="23" Margin="234,225,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" ToolTip="Title"/>
         <DatePicker x:Name="DPFrom" HorizontalAlignment="Left" Margin="39,253,0,0" VerticalAlignment="Top" Width="120" Text="From Date" FirstDayOfWeek="Monday" ToolTip="From Date"/>
-        <DatePicker HorizontalAlignment="Left" Margin="234,253,0,0" VerticalAlignment="Top" Width="120" FirstDayOfWeek="Monday" ToolTip="End Date"/>
+        <DatePicker x:Name="DPUntil" HorizontalAlignment="Left" Margin="234,253,0,0" VerticalAlignment="Top" Width="120" FirstDayOfWeek="Monday" ToolTip="End Date"/>
         <CheckBox x:Name="ChkbxCurrentEMP" Content="Currently employed" HorizontalAlignment="Left" Margin="359,258,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="TxtbxNotes" HorizontalAlignment="Left" Height="120" Margin="39,282,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="315" ToolTip="Notes"/>
         <Button x:Name="BtnAddReference" Content="Reference" HorizontalAlignment="Left" Margin="397,196,0,0" VerticalAlignment="Top" Width="90" Click="BtnReference_Click"/>
@@ -47,5 +47,6 @@
 
         <Label x:Name="LblPage" Content="Employment History" HorizontalAlignment="Left" Margin="446,358,0,0" VerticalAlignment="Top" Width="125"/>
         <Button x:Name="BtnSaveExp" Content="Add Experience" HorizontalAlignment="Left" Margin="396,282,0,0" VerticalAlignment="Top" Width="91" Click="BtnSaveExp_Click"/>
+        <Button x:Name="BtnDeleteExp" Content="Remove Exp..." HorizontalAlignment="Left" Margin="397,307,0,0" VerticalAlignment="Top" Width="90" Click="BtnDeleteExp_Click"/>
     </Grid>
 </Page>

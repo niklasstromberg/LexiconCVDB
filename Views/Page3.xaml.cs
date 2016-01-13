@@ -89,10 +89,15 @@ namespace XBAPLexiconCVDBInterface.Views
 
         int eduID;
         Educations eduToAdd;
-        private async void AddEdu()
+        private async Task<int> AddEdu()
         {
+            int tmp = Convert.ToInt16(TxtbxYear.Text);
             using (var db = new CVDBContext())
             {
+                var query = from edu in db.Educations
+                            where edu.Course == TxtbxCourse.Text && edu.Degree == TxtbxDegree.Text && edu.School == TxtbxSchool.Text && edu.Year == tmp && edu.Notes == TxtbxNotes.Text
+                            select edu;
+
                 eduToAdd = new Educations
                 {
                     Course = TxtbxCourse.Text,
@@ -101,22 +106,32 @@ namespace XBAPLexiconCVDBInterface.Views
                     Notes = TxtbxNotes.Text,
                     School = TxtbxSchool.Text
                 };
-                db.Educations.Add(eduToAdd);
-                db.Entry(eduToAdd).State = EntityState.Added;
-                await db.SaveChangesAsync();
+                if (query.Count() < 1)
+                {
+                    db.Educations.Add(eduToAdd);
+                    db.Entry(eduToAdd).State = EntityState.Added;
+                    await db.SaveChangesAsync();
+                    eduID = eduToAdd.GetEduID();
+                }
+                else
+                {
+                    eduID = query.FirstOrDefault().EDU_ID;
+                }
             }
+            return eduID;
         }
 
-        private void BtnAddEdu_Click(object sender, RoutedEventArgs e)
+        private async void BtnAddEdu_Click(object sender, RoutedEventArgs e)
         {
-            AddEdu();
-            eduID = eduToAdd.GetEduID();
+            int tmp = await AddEdu();
+            //eduID = eduToAdd.EDU_ID;
+            //eduID = eduToAdd.GetEduID();
             using (var db = new CVDBContext())
             {
                 User_EDU_REL uer = new User_EDU_REL
                 {
                     User_ID = uid,
-                    EDU_ID = eduID
+                    EDU_ID = tmp
                 };
                 db.User_EDU_REL.Add(uer);
                 db.Entry(uer).State = EntityState.Added;
@@ -150,7 +165,7 @@ namespace XBAPLexiconCVDBInterface.Views
         private void GrdEdu_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             BtnDeleteEdu.IsEnabled = false;
-            if(GrdEdu.SelectedIndex >= 0)
+            if (GrdEdu.SelectedIndex >= 0)
             {
                 var obj = GrdEdu.SelectedItem;
                 System.Type type = obj.GetType();
@@ -170,7 +185,7 @@ namespace XBAPLexiconCVDBInterface.Views
 
         private void BtnDeleteEdu_Click(object sender, RoutedEventArgs e)
         {
-            using(var db = new CVDBContext())
+            using (var db = new CVDBContext())
             {
                 var query = from rel in db.User_EDU_REL
                             where rel.User_ID == uid && rel.EDU_ID == IDtoshow
