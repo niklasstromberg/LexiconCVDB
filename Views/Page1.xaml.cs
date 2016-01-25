@@ -18,6 +18,9 @@ using System.Data.Entity;
 using XBAPLexiconCVDBInterface.Extentionmethods;
 using System.Collections.Generic;
 using XBAPLexiconCVDBInterface.ViewModels;
+using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
+using System.Windows.Controls.Primitives;
+using System.Collections;
 
 namespace XBAPLexiconCVDBInterface.Views
 {
@@ -36,19 +39,18 @@ namespace XBAPLexiconCVDBInterface.Views
         {
             InitializeComponent();
             ShowHide();
+            FillGrid();
+        }
 
-            using (SqlConnection con = new SqlConnection(conn))
+        private void FillGrid()
+        {
+            using(var db = new CVDBContext())
             {
-                string SqlQ = string.Format("select * from view_user_list");
-                //select user_ID as ID, first_name as Förnamn, last_name as Efternamn from users
-                con.Open();
-                SqlCommand com = new SqlCommand(SqlQ, con);
-                using (SqlDataAdapter adapter = new SqlDataAdapter(com))
-                {
-                    DataTable dt = new DataTable();
-                    adapter.Fill(dt);
-                    dgContentList.ItemsSource = dt.DefaultView;
-                }
+                var query = from u in db.Users
+                            join ud in db.User_Details on u.User_ID equals ud.User_ID
+                            orderby u.Last_Name, u.First_Name, ud.Available, ud.Available_Date
+                            select new { u.User_ID, u.Drivers_Licence, u.First_Name, u.Last_Name, ud.Available, ud.Available_Date };
+                dgContentList.ItemsSource = query.ToList();
             }
         }
 
@@ -88,16 +90,21 @@ namespace XBAPLexiconCVDBInterface.Views
 
         private void dgContentList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            DataGrid dg = sender as DataGrid;
-            DataRowView selected = (DataRowView)dg.SelectedItems[0];
-            selectedUID = selected.Row.Field<int>(0);
-            FillDetails(selectedUID);
-            LblPersonalInformation.Content = selected.Row.Field<string>(1) + " " + selected.Row.Field<string>(2);
-            txtbxtest.Text = selectedUID.ToString();
-            GetImage();
-            ShowHide();
-            Page2 p2 = new Page2(selectedUID);
-            FrmContent.Navigate(p2);
+            if (dgContentList.SelectedIndex >= 0)
+            {
+                var obj = dgContentList.SelectedItem;
+                System.Type type = obj.GetType();
+                selectedUID = (int)type.GetProperty("User_ID").GetValue(obj, null);
+                FillDetails(selectedUID);
+                string first = (string)type.GetProperty("First_Name").GetValue(obj, null);
+                string last = (string)type.GetProperty("Last_Name").GetValue(obj, null);
+                LblPersonalInformation.Content = first.CapitalizeFirst() + " " + last.CapitalizeFirst();
+                txtbxtest.Text = selectedUID.ToString();
+                GetImage();
+                ShowHide();
+                Page2 p2 = new Page2(selectedUID);
+                FrmContent.Navigate(p2);
+            }
         }
 
         // Helpermethods
@@ -556,7 +563,7 @@ namespace XBAPLexiconCVDBInterface.Views
             PopupDelete.IsOpen = false;
             BtnNewLog.Content = "New Log";
 
-
+            
         }
 
         private int getEventID(string s)
@@ -565,9 +572,70 @@ namespace XBAPLexiconCVDBInterface.Views
             return v.Key;
         }
 
+        private void BtnSearch_Click(object sender, RoutedEventArgs e)
+        {
+            using(var db = new CVDBContext())
+            {
+                var query = from user in db.Users
+                            join ud in db.User_Details on user.User_ID equals ud.User_ID
+                            where user.First_Name == TxtBoxSearch.Text ||
+                            user.Last_Name == TxtBoxSearch.Text
+                            orderby user.Last_Name, user.First_Name, ud.Available, ud.Available_Date
+                            select new { user.User_ID, user.First_Name, user.Last_Name, ud.Available, ud.Available_Date };
+                dgContentList.ItemsSource = query.ToList();
+            }
+        }
 
+        private void TxtBoxSearch_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            txtbxtest.Text = "";
+            if (TxtBoxSearch.Text.Length == 0)
+            {
+                FillGrid();
+            }
+            else
+            {
+                var rows = GetDataGridRows(dgContentList);
+                List<DataGridRow> filteredList = new List<DataGridRow>();
 
+                foreach (DataGridRow r in rows)
+                {
+                    //r.Visibility = Visibility.Hidden;
+                    foreach (DataGridColumn column in dgContentList.Columns)
+                    {
+                        if (column.GetCellContent(r) is TextBlock)
+                        {
+                            TextBlock cellContent = column.GetCellContent(r) as TextBlock;
+                            string content = cellContent.Text.ToLower();
+                            if (content.Contains(TxtBoxSearch.Text.ToLower()))
+                            {
+                                filteredList.Add(r);
+                                //r.Visibility = Visibility.Visible;
+                                txtbxtest.Text += r.Item.ToString();
+                            }
+                        }
+                    }
+                }
+                dgContentList.ItemsSource = filteredList;
+            }
+        }
 
+        public IEnumerable<DataGridRow> GetDataGridRows(DataGrid grid)
+        {
+            var itemsSource = grid.ItemsSource as IEnumerable;
+            if (null == itemsSource) yield return null;
+            foreach (var item in itemsSource)
+            {
+                var row = grid.ItemContainerGenerator.ContainerFromItem(item) as DataGridRow;
+                if (null != row) yield return row;
+            }
+        }
+
+        private void BtnClearSearch_Click(object sender, RoutedEventArgs e)
+        {
+            //FillGrid();
+            TxtBoxSearch.Text = "";
+        }
     }
 }
 

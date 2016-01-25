@@ -15,20 +15,22 @@
         <Button x:Name="BtnPage6" Content="&gt;" HorizontalAlignment="Left" Margin="522,389,0,0" VerticalAlignment="Top" Width="40" Height="40" ToolTip="Tags" FontSize="18" Click="BtnPage6_Click" IsEnabled="False" />
         <Label x:Name="LblSkills" Content="Skills:" HorizontalAlignment="Left" Margin="39,15,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="16"/>
         <Label x:Name="LblPage" Content="Skills" HorizontalAlignment="Left" Margin="522,358,0,0" VerticalAlignment="Top" Width="54"/>
-        <Grid Margin="39,50,10,140">
+        <Grid x:Name="SkillGrid" Margin="39,50,10,140">
             <ItemsControl Name="skills">
                 <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel />
+                    <ItemsPanelTemplate x:Name="ipt">
+                        <WrapPanel x:Name="wpskills" ClipToBounds="True"/>
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
-                    <DataTemplate>
+                    <DataTemplate x:Name="DTSkills">
                         <Button x:Name="BtnTest" Content="{Binding}" Margin="0,0,5,5" Click="BtnTest_Click"/>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </Grid>
+        <Button x:Name="BtnAddSkill" Content="Add Skill" HorizontalAlignment="Left" Margin="10,389,0,0" VerticalAlignment="Top" Width="75" Click="BtnAddSkill_Click"/>
+        <TextBox x:Name="TxtbxAddSkill" HorizontalAlignment="Left" Height="23" Margin="90,386,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
 
         <!--<ItemsControl ItemsSource="{Binding Source=DataContext}" BorderThickness="2">
             <ItemsControl.ItemTemplate>

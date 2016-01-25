@@ -13,7 +13,17 @@
         <Border BorderBrush="WhiteSmoke" BorderThickness="1" HorizontalAlignment="Left" Height="429" Margin="0,10,0,0" VerticalAlignment="Top" Width="562"/>
         <Button x:Name="BtnPage2" Content="&lt;" HorizontalAlignment="Left" VerticalAlignment="Top" Width="40" Height="40" ToolTip="Education" FontSize="18" Margin="477,389,0,0" RenderTransformOrigin="0.675,1.275" Click="BtnPage3_Click"/>
         <Button x:Name="BtnPage4" Content="&gt;" HorizontalAlignment="Left" Margin="522,389,0,0" VerticalAlignment="Top" Width="40" Height="40" ToolTip="Skills" FontSize="18" Click="BtnPage5_Click"/>
-        <DataGrid x:Name="GrdEmpHis" HorizontalAlignment="Left" Margin="39,15,0,0" VerticalAlignment="Top" Height="139" Width="448" ToolTip="Education" SelectionChanged="GrdEmpHis_SelectionChanged"/>
+        <DataGrid x:Name="GrdEmpHis" HorizontalAlignment="Left" Margin="39,15,0,0" VerticalAlignment="Top" Height="139" Width="448" ToolTip="Education" SelectionChanged="GrdEmpHis_SelectionChanged" AutoGenerateColumns="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="EMP_HIS_ID" Visibility="Collapsed" Binding="{Binding EMP_HIS_ID}"/>
+                <DataGridTextColumn Header="From" Binding="{Binding From_Date}"/>
+                <DataGridTextColumn Header="To" Binding="{Binding Until_Date}" />
+                <DataGridTextColumn Header="Company" Binding="{Binding Company_Name}" />
+                <DataGridTextColumn Header="Position" Binding="{Binding Position}"/>
+                <DataGridTextColumn Header="First Name" Binding="{Binding First_Name}" />
+                <DataGridTextColumn Header="Last Name" Binding="{Binding Last_Name}" />
+            </DataGrid.Columns>
+        </DataGrid>
         <TextBox x:Name="TxtbxCompany" HorizontalAlignment="Left" Height="23" Margin="39,197,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" ToolTip="Company"/>
         <TextBox x:Name="TxtbxDepartment" HorizontalAlignment="Left" Height="23" Margin="234,197,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" ToolTip="Department"/>
         <TextBox x:Name="TxtbxPosition" HorizontalAlignment="Left" Height="23" Margin="39,225,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" ToolTip="Position"/>
