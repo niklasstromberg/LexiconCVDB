@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
+using XBAPLexiconCVDBInterface.Views;
 
 namespace XBAPLexiconCVDBInterface.Extentionmethods
 {
@@ -22,7 +24,7 @@ namespace XBAPLexiconCVDBInterface.Extentionmethods
 
         public static bool StringTooShort(this string str)
         {
-            if(str.Length < 3)
+            if (str.Length < 3)
             {
                 return true;
             }
@@ -35,7 +37,7 @@ namespace XBAPLexiconCVDBInterface.Extentionmethods
         public static bool StringIsInt(this string str)
         {
             int i;
-            if(Int32.TryParse(str, out i))
+            if (Int32.TryParse(str, out i))
             {
                 return true;
             }
@@ -52,7 +54,7 @@ namespace XBAPLexiconCVDBInterface.Extentionmethods
 
         public static string GetFirst25(this string s)
         {
-            if(s.Length < 30)
+            if (s.Length < 30)
             {
                 return s;
             }
@@ -93,7 +95,7 @@ namespace XBAPLexiconCVDBInterface.Extentionmethods
             }
         }
 
-        public static int GetEduID(this Educations e)   
+        public static int GetEduID(this Educations e)
         {
             using (var db = new CVDBContext())
             {
@@ -109,5 +111,48 @@ namespace XBAPLexiconCVDBInterface.Extentionmethods
             }
         }
 
+        public static void UpdateGrid(this DataGrid grid)
+        {
+            List<object> gridlist = new List<object>();
+            using (var db = new CVDBContext())
+            {
+                var query1 = from u in db.Users
+                             select u.User_ID;
+                foreach(var user in query1.ToList())
+                {
+                    var query2 = from rel in db.User_Skill_REL
+                                 join skill in db.Skills on rel.Skill_ID equals skill.Skill_ID
+                                 where rel.User_ID == user
+                                 select skill.Skill_Name;
+                    string skillstring = "";
+                    foreach (var v in query2)
+                    {
+                        skillstring += v;
+                    }
+                    var query3 = from rel in db.User_Tag_REL
+                                 join tag in db.Tags on rel.Tag_ID equals tag.Tag_ID
+                                 where rel.User_ID == user
+                                 select tag.Tag_Name;
+                    string tagstring = "";
+                    foreach (var v in query3)
+                    {
+                        tagstring += v;
+                    }
+
+                    var query4 = from u in db.Users
+                                 join ud in db.User_Details on u.User_ID equals ud.User_ID
+                                 where u.User_ID == user
+                                 orderby u.Last_Name, u.First_Name, ud.Available, ud.Available_Date
+                                 select new { u.User_ID, u.First_Name, u.Last_Name, ud.Available, ud.Available_Date, tagstring, skillstring };
+                    gridlist.Add(query4.First());
+                }
+                grid.ItemsSource = gridlist;
+            }
+        }
+
+        public static void Save(this Page1 p, Users user, Adresses adress)
+        {
+
+        }
     }
 }

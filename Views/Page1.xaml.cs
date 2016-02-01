@@ -21,6 +21,7 @@ using XBAPLexiconCVDBInterface.ViewModels;
 using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using System.Windows.Controls.Primitives;
 using System.Collections;
+using System.Windows.Navigation;
 
 namespace XBAPLexiconCVDBInterface.Views
 {
@@ -39,19 +40,16 @@ namespace XBAPLexiconCVDBInterface.Views
         {
             InitializeComponent();
             ShowHide();
-            FillGrid();
+            dgContentList.UpdateGrid();
+            FillTags();
         }
 
-        private void FillGrid()
+        string currentPage = "";
+        public object GetCurrentPage()
         {
-            using(var db = new CVDBContext())
-            {
-                var query = from u in db.Users
-                            join ud in db.User_Details on u.User_ID equals ud.User_ID
-                            orderby u.Last_Name, u.First_Name, ud.Available, ud.Available_Date
-                            select new { u.User_ID, u.Drivers_Licence, u.First_Name, u.Last_Name, ud.Available, ud.Available_Date };
-                dgContentList.ItemsSource = query.ToList();
-            }
+            object CurrentPage = FrmContent.Content.GetType();
+            currentPage = CurrentPage.ToString();
+            return CurrentPage;
         }
 
         private void BtnCreate_Click(object sender, RoutedEventArgs e)
@@ -94,16 +92,20 @@ namespace XBAPLexiconCVDBInterface.Views
             {
                 var obj = dgContentList.SelectedItem;
                 System.Type type = obj.GetType();
-                selectedUID = (int)type.GetProperty("User_ID").GetValue(obj, null);
-                FillDetails(selectedUID);
-                string first = (string)type.GetProperty("First_Name").GetValue(obj, null);
-                string last = (string)type.GetProperty("Last_Name").GetValue(obj, null);
-                LblPersonalInformation.Content = first.CapitalizeFirst() + " " + last.CapitalizeFirst();
-                txtbxtest.Text = selectedUID.ToString();
-                GetImage();
-                ShowHide();
-                Page2 p2 = new Page2(selectedUID);
-                FrmContent.Navigate(p2);
+                if (type != null)
+                {
+                    selectedUID = (int)type.GetProperty("User_ID").GetValue(obj, null);
+                    FillDetails(selectedUID);
+                    string first = (string)type.GetProperty("First_Name").GetValue(obj, null);
+                    string last = (string)type.GetProperty("Last_Name").GetValue(obj, null);
+                    LblPersonalInformation.Content = first.CapitalizeFirst() + " " + last.CapitalizeFirst();
+                    txtbxtest.Text = selectedUID.ToString();
+                    GetImage();
+                    LblTags.Content = FillLabelTags(selectedUID);
+                    ShowHide();
+                    Page2 p2 = new Page2(selectedUID);
+                    FrmContent.Navigate(p2);
+                }
             }
         }
 
@@ -122,6 +124,10 @@ namespace XBAPLexiconCVDBInterface.Views
                 BtnUserImage.Visibility = Visibility.Hidden;
                 image.Visibility = Visibility.Hidden;
                 BtnDelete.Visibility = Visibility.Hidden;
+                LblTags.Visibility = Visibility.Hidden;
+                TxtbxTagFilter.Visibility = Visibility.Hidden;
+                BtnAddTag.Visibility = Visibility.Hidden;
+                LstBxTags.Visibility = Visibility.Hidden;
                 PopupDelete.IsOpen = false;
                 PopupDetails.IsOpen = false;
                 PopupEditJournal.IsOpen = false;
@@ -136,6 +142,10 @@ namespace XBAPLexiconCVDBInterface.Views
                 BtnUserImage.Visibility = Visibility.Visible;
                 image.Visibility = Visibility.Visible;
                 BtnDelete.Visibility = Visibility.Visible;
+                LblTags.Visibility = Visibility.Visible;
+                TxtbxTagFilter.Visibility = Visibility.Visible;
+                BtnAddTag.Visibility = Visibility.Visible;
+                LstBxTags.Visibility = Visibility.Visible;
                 PopupDetails.IsOpen = false;
                 PopupDelete.IsOpen = false;
                 PopupEditJournal.IsOpen = false;
@@ -327,26 +337,7 @@ namespace XBAPLexiconCVDBInterface.Views
             PopupLog.IsOpen = false;
             PopupEditLog.IsOpen = false;
             PopupEditJournal.IsOpen = false;
-            //DGJournals.Items.Clear();
             FillJournals();
-
-            //using (var db = new CVDBContext())
-            //{
-            //    var query = from j in db.Journals
-            //                where j.User_ID == selectedUID
-            //                select new { Journal_ID = j.Journal_ID, Created = j.Created, Notes = j.Notes };
-            //    var tmp = query.ToList();
-            //    DGJournals.ItemsSource = tmp;
-            //    //foreach (var v in tmp)
-            //    //{
-            //    //    v.Created = v.Created.Date;
-            //    //    v.Notes = v.Notes.GetFirst25() + "...";
-            //    //}
-            //    //var query2 = from j2 in tmp
-            //    //             select new { Journal_ID = j2.Journal_ID, Date = j2.Created.Date, Journal = j2.Notes.GetFirst25() };
-            //    //var results = query2.ToList();
-            //    //DGJournals.ItemsSource = results;
-            //}
         }
 
         private void BtnNewJournal_Click(object sender, RoutedEventArgs e)
@@ -443,8 +434,6 @@ namespace XBAPLexiconCVDBInterface.Views
         {
             PopupEditLog.IsOpen = PopupEditLog.IsOpen == true ? false : true;
             BtnNewLog.Content = PopupEditLog.IsOpen == true ? "Close" : "New Log";
-            //DGLogs.SelectedIndex = -1;
-            //DGLogs.SelectedItem = null;
             LblLogDate.Content = DateTime.Now;
             string lhName = "";
             using (var db = new CVDBContext())
@@ -497,7 +486,6 @@ namespace XBAPLexiconCVDBInterface.Views
                 }
                 BtnLogDelete.IsEnabled = true;
             }
-
         }
 
         private void BtnLogDelete_Click(object sender, RoutedEventArgs e)
@@ -562,8 +550,6 @@ namespace XBAPLexiconCVDBInterface.Views
             PopupDetails.IsOpen = false;
             PopupDelete.IsOpen = false;
             BtnNewLog.Content = "New Log";
-
-            
         }
 
         private int getEventID(string s)
@@ -574,7 +560,7 @@ namespace XBAPLexiconCVDBInterface.Views
 
         private void BtnSearch_Click(object sender, RoutedEventArgs e)
         {
-            using(var db = new CVDBContext())
+            using (var db = new CVDBContext())
             {
                 var query = from user in db.Users
                             join ud in db.User_Details on user.User_ID equals ud.User_ID
@@ -591,7 +577,7 @@ namespace XBAPLexiconCVDBInterface.Views
             txtbxtest.Text = "";
             if (TxtBoxSearch.Text.Length == 0)
             {
-                FillGrid();
+                dgContentList.UpdateGrid();
             }
             else
             {
@@ -600,7 +586,6 @@ namespace XBAPLexiconCVDBInterface.Views
 
                 foreach (DataGridRow r in rows)
                 {
-                    //r.Visibility = Visibility.Hidden;
                     foreach (DataGridColumn column in dgContentList.Columns)
                     {
                         if (column.GetCellContent(r) is TextBlock)
@@ -609,9 +594,11 @@ namespace XBAPLexiconCVDBInterface.Views
                             string content = cellContent.Text.ToLower();
                             if (content.Contains(TxtBoxSearch.Text.ToLower()))
                             {
-                                filteredList.Add(r);
-                                //r.Visibility = Visibility.Visible;
-                                txtbxtest.Text += r.Item.ToString();
+                                if (!filteredList.Contains(r))
+                                {
+                                    filteredList.Add(r);
+                                    txtbxtest.Text += r.Item.ToString();
+                                }
                             }
                         }
                     }
@@ -633,8 +620,159 @@ namespace XBAPLexiconCVDBInterface.Views
 
         private void BtnClearSearch_Click(object sender, RoutedEventArgs e)
         {
-            //FillGrid();
             TxtBoxSearch.Text = "";
+        }
+
+        private void FillTags()
+        {
+            BtnAddTag.IsEnabled = false;
+            TxtbxTagFilter.Text = "";
+            using (var db = new CVDBContext())
+            {
+                var query = from tag in db.Tags
+                            select tag.Tag_Name;
+                LstBxTags.ItemsSource = query.ToList();
+            }
+            //FillLabelTags(selectedUID);
+            //HighLightUserTags();
+        }
+
+        private void TxtbxTagFilter_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            List<string> filteredTags = new List<string>();
+            BtnAddTag.IsEnabled = false;
+            if (TxtbxTagFilter.Text.Length == 0)
+            {
+                FillTags();
+                BtnAddTag.IsEnabled = false;
+            }
+            else
+            {
+
+                foreach (string s in LstBxTags.ItemsSource)
+                {
+                    if (s.ToLower().Contains(TxtbxTagFilter.Text.ToLower()))
+                    {
+                        filteredTags.Add(s);
+                    }
+                }
+                LstBxTags.ItemsSource = filteredTags;
+            }
+            if (filteredTags.Count == 0)
+            {
+                BtnAddTag.IsEnabled = true;
+            }
+        }
+
+
+        private void BtnAddTag_Click(object sender, RoutedEventArgs e)
+        {
+            using (var db = new CVDBContext())
+            {
+                Tags t = new Tags { Tag_Name = TxtbxTagFilter.Text };
+                db.Tags.Add(t);
+                db.Entry(t).State = EntityState.Added;
+                db.SaveChanges();
+            }
+            FillTags();
+        }
+
+        private void LstBxTags_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (LstBxTags.SelectedItem != null)
+            {
+                string tmp = LstBxTags.SelectedItem.ToString();
+                if (userTags.Contains(tmp))
+                {
+                    //LstBxTags.SelectedItems.Remove(LstBxTags.Items.CurrentItem);
+                    //delete from database
+                    using (var db = new CVDBContext())
+                    {
+                        var i = from tag in db.Tags
+                                where tag.Tag_Name == tmp
+                                select tag.Tag_ID;
+                        int id = i.FirstOrDefault();
+                        var query = from rel in db.User_Tag_REL
+                                    where rel.User_ID == selectedUID && rel.Tag_ID == id
+                                    select rel;
+                        User_Tag_REL toDelete = query.FirstOrDefault();
+                        db.User_Tag_REL.Remove(toDelete);
+                        db.SaveChanges();
+                    }
+                    LblTags.Content = FillLabelTags(selectedUID);
+                    txtbxtest.Text = "deleted from database: " + tmp;
+                    //Unselect();
+                }
+                else
+                {
+                    //LstBxTags.SelectedItems.Add(LstBxTags.Items.CurrentItem);
+                    //save to database
+                    using (var db = new CVDBContext())
+                    {
+                        var i = from tag in db.Tags
+                                where tag.Tag_Name == tmp
+                                select tag.Tag_ID;
+                        int id = i.FirstOrDefault();
+                        User_Tag_REL toAdd = new User_Tag_REL { User_ID = selectedUID, Tag_ID = id };
+                        db.User_Tag_REL.Add(toAdd);
+                        db.Entry(toAdd).State = EntityState.Added;
+                        db.SaveChanges();
+                    }
+                    LblTags.Content = FillLabelTags(selectedUID);
+                    txtbxtest.Text = "saved to database: " + tmp;
+                    //Unselect();
+                }
+                Unselect();
+            }
+        }
+
+        private void Unselect()
+        {
+            LstBxTags.UnselectAll();
+        }
+
+
+        List<string> userTags = new List<string>();
+        private string FillLabelTags(int uid)
+        {
+            LblTags.Content = "";
+            using (var db = new CVDBContext())
+            {
+                var query = from rel in db.User_Tag_REL
+                            join tag in db.Tags on rel.Tag_ID equals tag.Tag_ID
+                            where rel.User_ID == uid
+                            select tag.Tag_Name;
+                userTags = query.ToList();
+            }
+            if (userTags.Count > 0)
+            {
+                //HighLightUserTags();
+                return string.Join(",", userTags).CapitalizeFirst();
+            }
+            else
+            {
+                return "";
+            }
+        }
+
+        private void HighLightUserTags()
+        {
+            LstBxTags.SelectedItems.Clear();
+            foreach (var item in LstBxTags.Items)
+            {
+                if (userTags.Contains(item.ToString()))
+                {
+                    LstBxTags.SelectedItems.Add(item);
+                    int i = LstBxTags.Items.IndexOf(item);
+                    int ii = LstBxTags.SelectedItems.Count;
+                    txtbxtest.Text += i + " " + ii;
+                }
+            }
+        }
+
+        private void LstBxTags_LostFocus(object sender, RoutedEventArgs e)
+        {
+            FillLabelTags(selectedUID);
         }
     }
 }

@@ -24,5 +24,12 @@ namespace XBAPLexiconCVDBInterface.ViewModels
                 
             }
         }
+
+        public void SavePage1(Users user, Adresses adress)
+        {
+
+        }
     }
+
+
 }
