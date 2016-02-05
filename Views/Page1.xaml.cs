@@ -101,12 +101,12 @@ namespace XBAPLexiconCVDBInterface.Views
                 var obj = dgContentList.SelectedItem;
                 DataGridColumn column = dgContentList.Columns[0];
 
-                    if (column.GetCellContent(obj) is TextBlock)
-                    {
-                        TextBlock cellContent = column.GetCellContent(obj) as TextBlock;
-                        string content = cellContent.Text.ToLower();
-                        selectedUID = Convert.ToInt32(content);
-                    }
+                if (column.GetCellContent(obj) is TextBlock)
+                {
+                    TextBlock cellContent = column.GetCellContent(obj) as TextBlock;
+                    string content = cellContent.Text.ToLower();
+                    selectedUID = Convert.ToInt32(content);
+                }
                 System.Type type = obj.GetType();
                 if (type != null)
                 {
@@ -130,6 +130,10 @@ namespace XBAPLexiconCVDBInterface.Views
                     GetImage();
                     LblTags.Content = FillLabelTags(selectedUID);
                     ShowHide();
+                    Btnp2.Background = System.Windows.Media.Brushes.Green;
+                    Btnp3.Background = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FFDDDDDD"));
+                    Btnp4.Background = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FFDDDDDD"));
+                    Btnp5.Background = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FFDDDDDD"));
                     Page2 p2 = new Page2(selectedUID);
                     FrmContent.Navigate(p2);
                 }
@@ -155,6 +159,10 @@ namespace XBAPLexiconCVDBInterface.Views
                 TxtbxTagFilter.Visibility = Visibility.Hidden;
                 BtnAddTag.Visibility = Visibility.Hidden;
                 LstBxTags.Visibility = Visibility.Hidden;
+                Btnp2.Visibility = Visibility.Hidden;
+                Btnp3.Visibility = Visibility.Hidden;
+                Btnp4.Visibility = Visibility.Hidden;
+                Btnp5.Visibility = Visibility.Hidden;
                 PopupDelete.IsOpen = false;
                 PopupDetails.IsOpen = false;
                 PopupEditJournal.IsOpen = false;
@@ -173,6 +181,10 @@ namespace XBAPLexiconCVDBInterface.Views
                 TxtbxTagFilter.Visibility = Visibility.Visible;
                 BtnAddTag.Visibility = Visibility.Visible;
                 LstBxTags.Visibility = Visibility.Visible;
+                Btnp2.Visibility = Visibility.Visible;
+                Btnp3.Visibility = Visibility.Visible;
+                Btnp4.Visibility = Visibility.Visible;
+                Btnp5.Visibility = Visibility.Visible;
                 PopupDetails.IsOpen = false;
                 PopupDelete.IsOpen = false;
                 PopupEditJournal.IsOpen = false;
@@ -341,7 +353,7 @@ namespace XBAPLexiconCVDBInterface.Views
         {
             TxtDetailsSalary.Text = AddSEK(TxtDetailsSalary.Text);
         }
-#endregion
+        #endregion
 
         #region PopupJournals
         int JournalID;
@@ -606,26 +618,34 @@ namespace XBAPLexiconCVDBInterface.Views
             {
                 var query = from user in db.Users
                             join ud in db.User_Details on user.User_ID equals ud.User_ID
-                            where user.First_Name == TxtBoxSearch.Text ||
-                            user.Last_Name == TxtBoxSearch.Text
+                            where user.First_Name.Contains(TxtBoxSearch.Text) ||
+                            user.Last_Name.Contains(TxtBoxSearch.Text)
                             orderby user.Last_Name, user.First_Name, ud.Available, ud.Available_Date
                             select new { user.User_ID, user.First_Name, user.Last_Name, ud.Available, ud.Available_Date };
                 dgContentList.ItemsSource = query.ToList();
             }
         }
 
+        List<string> searchliststrings = new List<string>();
         private void TxtBoxSearch_TextChanged(object sender, TextChangedEventArgs e)
         {
+            PopupSearchList.IsOpen = false;
+            SearchList.SelectedItem = null;
+            SearchList.SelectedIndex = -1;
+            SearchList.ItemsSource = searchliststrings;
+            searchliststrings.Clear();
             txtbxtest.Text = "";
             if (TxtBoxSearch.Text.Length == 0)
             {
                 dgContentList.UpdateGrid();
+                PopupSearchList.IsOpen = false;
+                searchliststrings.Clear();
             }
             else
             {
                 var rows = GetDataGridRows(dgContentList);
                 List<DataGridRow> filteredList = new List<DataGridRow>();
-
+                searchliststrings.Clear();
                 foreach (DataGridRow r in rows)
                 {
                     foreach (DataGridColumn column in dgContentList.Columns)
@@ -636,6 +656,9 @@ namespace XBAPLexiconCVDBInterface.Views
                             string content = cellContent.Text.ToLower();
                             if (content.Contains(TxtBoxSearch.Text.ToLower()))
                             {
+                                if (!searchliststrings.Contains(content))
+                                    searchliststrings.Add(content);
+                                //SearchList.ItemsSource = searchliststrings;
                                 if (!filteredList.Contains(r))
                                 {
                                     filteredList.Add(r);
@@ -646,6 +669,7 @@ namespace XBAPLexiconCVDBInterface.Views
                     }
                 }
                 dgContentList.ItemsSource = filteredList;
+                SearchList.ItemsSource = searchliststrings;
             }
         }
 
@@ -667,9 +691,41 @@ namespace XBAPLexiconCVDBInterface.Views
             dgContentList.SelectedIndex = -1;
             selectedUID = -1;
             ShowHide();
+            //SearchList.ItemsSource = null;
             Page_default p = new Page_default();
             FrmContent.Navigate(p);
         }
+
+        private void TxtBoxSearch_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            if (TxtBoxSearch.Text.Length > 0)
+                SearchList.ItemsSource = searchliststrings;
+                PopupSearchList.IsOpen = true;
+        }
+
+        private void SearchList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (SearchList.SelectedItem != null)
+            {
+                string s = SearchList.SelectedItem.ToString();
+                s = s.Substring(TxtBoxSearch.Text.Length);
+                TxtBoxSearch.Text += s;
+                PopupSearchList.IsOpen = false;
+                searchliststrings.Clear();
+                //SearchList.ItemsSource = null;
+            }
+        }
+
+        private void SearchList_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            PopupSearchList.IsOpen = false;
+        }
+
+        private void TxtBoxSearch_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            //PopupSearchList.IsOpen = false;
+        }
+
         #endregion
 
         #region Tags
@@ -831,13 +887,47 @@ namespace XBAPLexiconCVDBInterface.Views
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             Button b = sender as Button;
+            string s = b.Name;
             b.Background = System.Windows.Media.Brushes.Green;
-            if(FrmContent.Content.GetType() == typeof(Page2))
+            switch (b.Name)
+            {
+                case "Btnp2":
+                    Page2 p2 = new Page2(selectedUID);
+                    FrmContent.Navigate(p2);
+                    Btnp3.Background = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FFDDDDDD"));
+                    Btnp4.Background = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FFDDDDDD"));
+                    Btnp5.Background = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FFDDDDDD"));
+                    break;
+                case "Btnp3":
+                    Page3 p3 = new Page3(selectedUID);
+                    FrmContent.Navigate(p3);
+                    Btnp2.Background = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FFDDDDDD"));
+                    Btnp4.Background = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FFDDDDDD"));
+                    Btnp5.Background = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FFDDDDDD"));
+                    break;
+                case "Btnp4":
+                    Page4 p4 = new Page4(selectedUID);
+                    FrmContent.Navigate(p4);
+                    Btnp2.Background = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FFDDDDDD"));
+                    Btnp3.Background = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FFDDDDDD"));
+                    Btnp5.Background = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FFDDDDDD"));
+                    break;
+                case "Btnp5":
+                    Page5 p5 = new Page5(selectedUID);
+                    FrmContent.Navigate(p5);
+                    Btnp2.Background = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FFDDDDDD"));
+                    Btnp3.Background = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FFDDDDDD"));
+                    Btnp4.Background = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FFDDDDDD"));
+                    break;
+            }
+            if (FrmContent.Content.GetType() == typeof(Page2))
             {
                 Page2 p2 = (Page2)FrmContent.Content;
+                dgContentList.UpdateGrid();
                 p2.Savep2();
             }
         }
+
     }
 }
 
