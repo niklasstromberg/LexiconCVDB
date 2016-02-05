@@ -22,6 +22,7 @@ using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using System.Windows.Controls.Primitives;
 using System.Collections;
 using System.Windows.Navigation;
+using System.ComponentModel;
 
 namespace XBAPLexiconCVDBInterface.Views
 {
@@ -73,15 +74,22 @@ namespace XBAPLexiconCVDBInterface.Views
 
             if (cofd.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                string name = "User" + selectedUID + "img";
-                CloudBlockBlob blockBlob = (App.Current as App).blobcontainer.GetBlockBlobReference(name);
-                blockBlob.Properties.ContentType = "image/jpg";
-                using (var fileStream = System.IO.File.OpenRead(cofd.FileName))
+                try
                 {
-                    await blockBlob.UploadFromStreamAsync(fileStream);
+                    string name = "User" + selectedUID + "img";
+                    CloudBlockBlob blockBlob = (App.Current as App).blobcontainer.GetBlockBlobReference(name);
+                    blockBlob.Properties.ContentType = "image/jpg";
+                    using (var fileStream = System.IO.File.OpenRead(cofd.FileName))
                     {
-                        GetImage();
+                        await blockBlob.UploadFromStreamAsync(fileStream);
+                        {
+                            GetImage();
+                        }
                     }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message + ex.InnerException, "uploading or downloading image error");
                 }
             }
         }
@@ -91,13 +99,32 @@ namespace XBAPLexiconCVDBInterface.Views
             if (dgContentList.SelectedIndex >= 0)
             {
                 var obj = dgContentList.SelectedItem;
+                DataGridColumn column = dgContentList.Columns[0];
+
+                    if (column.GetCellContent(obj) is TextBlock)
+                    {
+                        TextBlock cellContent = column.GetCellContent(obj) as TextBlock;
+                        string content = cellContent.Text.ToLower();
+                        selectedUID = Convert.ToInt32(content);
+                    }
                 System.Type type = obj.GetType();
                 if (type != null)
                 {
-                    selectedUID = (int)type.GetProperty("User_ID").GetValue(obj, null);
                     FillDetails(selectedUID);
-                    string first = (string)type.GetProperty("First_Name").GetValue(obj, null);
-                    string last = (string)type.GetProperty("Last_Name").GetValue(obj, null);
+                    string first = "";
+                    string last = "";
+                    DataGridColumn columnF = dgContentList.Columns[1];
+                    if (columnF.GetCellContent(obj) is TextBlock)
+                    {
+                        TextBlock cellContent = columnF.GetCellContent(obj) as TextBlock;
+                        first = cellContent.Text.ToLower();
+                    }
+                    DataGridColumn columnL = dgContentList.Columns[2];
+                    if (columnL.GetCellContent(obj) is TextBlock)
+                    {
+                        TextBlock cellContent = columnL.GetCellContent(obj) as TextBlock;
+                        last = cellContent.Text.ToLower();
+                    }
                     LblPersonalInformation.Content = first.CapitalizeFirst() + " " + last.CapitalizeFirst();
                     txtbxtest.Text = selectedUID.ToString();
                     GetImage();
@@ -158,23 +185,30 @@ namespace XBAPLexiconCVDBInterface.Views
         // is displayed
         public async void GetImage()
         {
-            if (await (App.Current as App).checkConnection())
+            try
             {
-                string name = "User" + selectedUID + "img";
-                if ((App.Current as App).blobcontainer.Exists())
+                if (await (App.Current as App).checkConnection())
                 {
-                    CloudBlockBlob blockBlob = (App.Current as App).blobcontainer.GetBlockBlobReference(name);
-                    if (blockBlob.Exists())
+                    string name = "User" + selectedUID + "img";
+                    if ((App.Current as App).blobcontainer.Exists())
                     {
-                        ImageSource imageSource = new BitmapImage(new Uri(blockBlob.Uri.ToString()));
-                        image.Source = imageSource;
-                    }
-                    else
-                    {
-                        System.Drawing.Bitmap bitmap = XBAPLexiconCVDBInterface.Properties.Resources.user;
-                        image.Source = BitmapToImageSource(bitmap);
+                        CloudBlockBlob blockBlob = (App.Current as App).blobcontainer.GetBlockBlobReference(name);
+                        if (blockBlob.Exists())
+                        {
+                            ImageSource imageSource = new BitmapImage(new Uri(blockBlob.Uri.ToString()));
+                            image.Source = imageSource;
+                        }
+                        else
+                        {
+                            System.Drawing.Bitmap bitmap = XBAPLexiconCVDBInterface.Properties.Resources.user;
+                            image.Source = BitmapToImageSource(bitmap);
+                        }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + ex.InnerException, "getting image error");
             }
         }
 
@@ -194,7 +228,7 @@ namespace XBAPLexiconCVDBInterface.Views
                 return bitmapimage;
             }
         }
-
+        #region PopupDelete
         private void BtnCancel_Click(object sender, RoutedEventArgs e)
         {
             PopupDelete.IsOpen = false;
@@ -227,7 +261,9 @@ namespace XBAPLexiconCVDBInterface.Views
             PopupLog.IsOpen = false;
             PopupEditLog.IsOpen = false;
         }
+        #endregion
 
+        #region PopupUserDetails
         private void BtnSaveDetails_Click(object sender, RoutedEventArgs e)
         {
             using (var db = new CVDBContext())
@@ -305,7 +341,9 @@ namespace XBAPLexiconCVDBInterface.Views
         {
             TxtDetailsSalary.Text = AddSEK(TxtDetailsSalary.Text);
         }
+#endregion
 
+        #region PopupJournals
         int JournalID;
         private void DGJournals_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -416,7 +454,9 @@ namespace XBAPLexiconCVDBInterface.Views
                 DGJournals.ItemsSource = tmp;
             }
         }
+        #endregion
 
+        #region PopupLogs
         public void FillLogs()
         {
             using (var db = new CVDBContext())
@@ -557,7 +597,9 @@ namespace XBAPLexiconCVDBInterface.Views
             var v = eventlist.Single(x => x.Value == s);
             return v.Key;
         }
+        #endregion
 
+        #region SearchMethods
         private void BtnSearch_Click(object sender, RoutedEventArgs e)
         {
             using (var db = new CVDBContext())
@@ -621,8 +663,16 @@ namespace XBAPLexiconCVDBInterface.Views
         private void BtnClearSearch_Click(object sender, RoutedEventArgs e)
         {
             TxtBoxSearch.Text = "";
+            dgContentList.SelectedItem = null;
+            dgContentList.SelectedIndex = -1;
+            selectedUID = -1;
+            ShowHide();
+            Page_default p = new Page_default();
+            FrmContent.Navigate(p);
         }
+        #endregion
 
+        #region Tags
         private void FillTags()
         {
             BtnAddTag.IsEnabled = false;
@@ -630,6 +680,7 @@ namespace XBAPLexiconCVDBInterface.Views
             using (var db = new CVDBContext())
             {
                 var query = from tag in db.Tags
+                            orderby tag.Tag_Name ascending
                             select tag.Tag_Name;
                 LstBxTags.ItemsSource = query.ToList();
             }
@@ -741,6 +792,7 @@ namespace XBAPLexiconCVDBInterface.Views
                 var query = from rel in db.User_Tag_REL
                             join tag in db.Tags on rel.Tag_ID equals tag.Tag_ID
                             where rel.User_ID == uid
+                            orderby tag.Tag_Name
                             select tag.Tag_Name;
                 userTags = query.ToList();
             }
@@ -773,6 +825,18 @@ namespace XBAPLexiconCVDBInterface.Views
         private void LstBxTags_LostFocus(object sender, RoutedEventArgs e)
         {
             FillLabelTags(selectedUID);
+        }
+        #endregion
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Button b = sender as Button;
+            b.Background = System.Windows.Media.Brushes.Green;
+            if(FrmContent.Content.GetType() == typeof(Page2))
+            {
+                Page2 p2 = (Page2)FrmContent.Content;
+                p2.Savep2();
+            }
         }
     }
 }

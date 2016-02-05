@@ -93,61 +93,84 @@ namespace XBAPLexiconCVDBInterface.Views
             //{
             //    tmp = await SaveCompany(TxtbxCompany.Text);
             //}
-            using (var db = new CVDBContext())
+            try
             {
-                int? tmp = null;
-                Employment_Histories e = db.Employment_Histories.Find(emp_hisID);
-                if (e != null)
+                using (var db = new CVDBContext())
                 {
-                    tmp = e.REF_ID;
-                }
-                if (tmp < 1 || tmp == null)
-                {
-                    if (TxtbxCompanyRef.Text.Length > 0 &&
-                        TxtbxEmailRef.Text.Length > 0 &&
-                        TxtbxFirstNameRef.Text.Length > 0 &&
-                        TxtbxLastNameRef.Text.Length > 0 &&
-                        TxtbxMobileRef.Text.Length > 0 &&
-                        TxtbxPhoneRef.Text.Length > 0 &&
-                        TxtbxTitleRef.Text.Length > 0)
+                    int? tmp = null;
+                    Employment_Histories e = db.Employment_Histories.Find(emp_hisID);
+                    if (e != null)
                     {
-                        return null;
+                        tmp = e.REF_ID;
+                        refID = e.REF_ID;
                     }
-                    else
+                    if (tmp < 1 || tmp == null)
                     {
-                        User_References ur = new User_References
+                        if (TxtbxCompanyRef.Text.Length > 0 &&
+                            TxtbxEmailRef.Text.Length > 0 &&
+                            TxtbxFirstNameRef.Text.Length > 0 &&
+                            TxtbxLastNameRef.Text.Length > 0 &&
+                            TxtbxMobileRef.Text.Length > 0 &&
+                            TxtbxPhoneRef.Text.Length > 0 &&
+                            TxtbxTitleRef.Text.Length > 0)
                         {
-                            Company_ID = await SaveCompany(TxtbxCompany.Text),
-                            First_Name = TxtbxFirstNameRef.Text,
-                            Last_Name = TxtbxLastNameRef.Text,
-                            Title = TxtbxTitleRef.Text,
-                            Phone = TxtbxPhoneRef.Text,
-                            Mobile = TxtbxMobileRef.Text,
-                            Email = TxtbxEmailRef.Text
-                        };
-                        db.User_References.Add(ur);
-                        db.Entry(ur).State = EntityState.Added;
-                        await db.SaveChangesAsync();
-                        PopupAddRef.IsOpen = false;
-                        return ur.REF_ID;
+                            return null;
+                        }
+                        else
+                        {
+                            User_References ur = new User_References
+                            {
+                                Company_ID = coID, //await SaveCompany(TxtbxCompany.Text),
+                                First_Name = TxtbxFirstNameRef.Text,
+                                Last_Name = TxtbxLastNameRef.Text,
+                                Title = TxtbxTitleRef.Text,
+                                Phone = TxtbxPhoneRef.Text,
+                                Mobile = TxtbxMobileRef.Text,
+                                Email = TxtbxEmailRef.Text
+                            };
+                            db.User_References.Add(ur);
+                            db.Entry(ur).State = EntityState.Added;
+                            await db.SaveChangesAsync();
+                            PopupAddRef.IsOpen = false;
+                            return ur.REF_ID;
+                        }
                     }
-                }
-                User_References u_r = db.User_References.Find(refID);
-                db.Entry(u_r).State = EntityState.Modified;
-                db.SaveChanges();
+                    User_References u_r = db.User_References.Find(refID);
+                    u_r.First_Name = TxtbxFirstNameRef.Text;
+                    u_r.Last_Name = TxtbxLastNameRef.Text;
+                    u_r.Title = TxtbxTitleRef.Text;
+                    u_r.Phone = TxtbxPhoneRef.Text;
+                    u_r.Mobile = TxtbxMobileRef.Text;
+                    u_r.Email = TxtbxEmailRef.Text;
+                    db.Entry(u_r).State = EntityState.Modified;
+                    db.SaveChanges();
 
-                return u_r.REF_ID;
+                    return u_r.REF_ID;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + ex.InnerException, "Save Error");
+                return null;
             }
         }
 
         private int GetRefID(string str)
         {
-            using (var db = new CVDBContext())
+            try
             {
-                var query = from r in db.User_References
-                            where r.Email == str
-                            select r;
-                return query.FirstOrDefault().REF_ID;
+                using (var db = new CVDBContext())
+                {
+                    var query = from r in db.User_References
+                                where r.Email == str
+                                select r;
+                    return query.FirstOrDefault().REF_ID;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + ex.InnerException, "Get ref id error");
+                return 0;
             }
         }
 
@@ -167,7 +190,7 @@ namespace XBAPLexiconCVDBInterface.Views
                 {
                     co = new Companies
                     {
-                        Company_Name = TxtbxCompanyRef.Text
+                        Company_Name = str
                     };
                     db.Companies.Add(co);
                     db.Entry(co).State = EntityState.Added;
@@ -183,61 +206,97 @@ namespace XBAPLexiconCVDBInterface.Views
             }
         }
 
+
         private int GetCompanyID(string str)
         {
-            using (var db = new CVDBContext())
+            try
             {
-                var query = from comp in db.Companies
-                            where comp.Company_Name == str
-                            select comp;
-                if (query.Count() == 1)
+                using (var db = new CVDBContext())
                 {
-                    return query.FirstOrDefault().Company_ID;
+                    var query = from comp in db.Companies
+                                where comp.Company_Name == str
+                                select comp;
+                    if (query.Count() == 1)
+                    {
+                        return query.FirstOrDefault().Company_ID;
+                    }
+                    else return 0;
                 }
-                else return 0;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + ex.InnerException, "get company id error");
+                return 0;
             }
         }
 
         private void FillGrdRef()
         {
-            using (var db = new CVDBContext())
+            try
             {
-                var query = from exp in db.Employment_Histories
-                            join com in db.Companies on exp.Company_ID equals com.Company_ID
-                            join refe in db.User_References on exp.REF_ID equals refe.REF_ID
-                            where exp.User_ID == uid
-                            select new { exp.EMP_HIS_ID, exp.From_Date, exp.Until_Date, com.Company_Name, exp.Position, refe.First_Name, refe.Last_Name };
-                GrdEmpHis.ItemsSource = query.OrderBy(x => x.From_Date).ToList();
+                using (var db = new CVDBContext())
+                {
+                    var query = from exp in db.Employment_Histories
+                                join com in db.Companies on exp.Company_ID equals com.Company_ID
+                                join refe in db.User_References on exp.REF_ID equals refe.REF_ID
+                                where exp.User_ID == uid
+                                select new { exp.EMP_HIS_ID, exp.From_Date, exp.Until_Date, com.Company_Name, exp.Position, refe.First_Name, refe.Last_Name };
+                    GrdEmpHis.ItemsSource = query.OrderBy(x => x.From_Date).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + ex.InnerException, "fill grid error");
             }
         }
 
         private void FillRef(int id)
         {
-            using (var db = new CVDBContext())
+            try
             {
-                User_References ur = db.User_References.Find(id);
-                TxtbxFirstNameRef.Text = ur.First_Name;
-                TxtbxLastNameRef.Text = ur.Last_Name;
-                TxtbxTitleRef.Text = ur.Title;
-                if (ur.Company_ID != null)
-                    TxtbxCompanyRef.Text = GetCompanyName((int)ur.Company_ID);
-                TxtbxPhoneRef.Text = ur.Phone;
-                TxtbxMobileRef.Text = ur.Mobile;
-                TxtbxEmailRef.Text = ur.Email;
+                using (var db = new CVDBContext())
+                {
+                    User_References ur = db.User_References.Find(id);
+                    TxtbxFirstNameRef.Text = ur.First_Name;
+                    TxtbxLastNameRef.Text = ur.Last_Name;
+                    TxtbxTitleRef.Text = ur.Title;
+                    if (ur.Company_ID != null)
+                        TxtbxCompanyRef.Text = GetCompanyName((int)ur.Company_ID);
+                    TxtbxPhoneRef.Text = ur.Phone;
+                    TxtbxMobileRef.Text = ur.Mobile;
+                    TxtbxEmailRef.Text = ur.Email;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + ex.InnerException, "fill reference error");
             }
         }
 
         private string GetCompanyName(int id)
         {
-            using (var db = new CVDBContext())
+            try
             {
-                Companies c = db.Companies.Find(id);
-                return c.Company_Name;
+                using (var db = new CVDBContext())
+                {
+                    Companies c = db.Companies.Find(id);
+                    return c.Company_Name;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + ex.InnerException, "get company name error");
+                return "";
             }
         }
 
         private void ClearFields()
         {
+            coID = 0;
+            refID = null;
+            emp_hisID = 0;
+            BtnDeleteExp.IsEnabled = false;
+            BtnSaveExp.Content = "Add Experience";
             TxtbxCompany.Text = "";
             TxtbxDepartment.Text = "";
             TxtbxNotes.Text = "";
@@ -268,41 +327,79 @@ namespace XBAPLexiconCVDBInterface.Views
 
         private async void BtnSaveExp_Click(object sender, RoutedEventArgs e)
         {
-            coID = await SaveCompany(TxtbxCompany.Text);
-            refID = await Save_Ref();
-            using (var db = new CVDBContext())
+            try
             {
-                if (emp_hisID < 1)
+                coID = await SaveCompany(TxtbxCompany.Text);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + ex.InnerException, "Company Error");
+            }
+            try
+            {
+                refID = await Save_Ref();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + ex.InnerException, "Reference Error");
+            }
+
+            try
+            {
+                using (var db = new CVDBContext())
                 {
-                    Employment_Histories eh = new Employment_Histories
+                    if (emp_hisID < 1)
                     {
-                        Company_ID = coID,
-                        User_ID = uid,
-                        Department = TxtbxDepartment.Text,
-                        Position = TxtbxPosition.Text,
-                        Title = TxtbxTitle.Text,
-                        From_Date = (DateTime)DPFrom.SelectedDate,
-                        Until_Date = (DateTime?)DPUntil.SelectedDate,
-                        Curr_Emp = (bool)ChkbxCurrentEMP.IsChecked ? true : false,
-                        REF_ID = refID,
-                        Notes = TxtbxNotes.Text
-                    };
-                    db.Employment_Histories.Add(eh);
-                    db.Entry(eh).State = EntityState.Added;
-                    db.SaveChanges();
-                }
-                else
-                {
-                    Employment_Histories eh = db.Employment_Histories.Find(emp_hisID);
-                    if (eh.REF_ID < 1 || eh.REF_ID == null)
-                    {
-                        int? tmp = await Save_Ref();
-                        eh.REF_ID = tmp;
+                        Employment_Histories eh = new Employment_Histories
+                        {
+                            Company_ID = coID,
+                            User_ID = uid,
+                            Department = TxtbxDepartment.Text,
+                            Position = TxtbxPosition.Text,
+                            Title = TxtbxTitle.Text,
+                            From_Date = (DateTime)DPFrom.SelectedDate,
+                            Until_Date = (DateTime?)DPUntil.SelectedDate,
+                            Curr_Emp = (bool)ChkbxCurrentEMP.IsChecked ? true : false,
+                            REF_ID = refID,
+                            Notes = TxtbxNotes.Text
+                        };
+                        if ((bool)ChkbxCurrentEMP.IsChecked)
+                        {
+                            eh.Until_Date = null;
+                        }
+                        db.Employment_Histories.Add(eh);
+                        db.Entry(eh).State = EntityState.Added;
+                        db.SaveChanges();
                     }
-                    eh.Company_ID = coID;
-                    db.Entry(eh).State = EntityState.Modified;
-                    db.SaveChanges();
+                    else
+                    {
+                        Employment_Histories eh = db.Employment_Histories.Find(emp_hisID);
+                        if (eh.REF_ID < 1 || eh.REF_ID == null)
+                        {
+                            int? tmp = await Save_Ref();
+                            eh.REF_ID = tmp;
+                        }
+                        eh.Company_ID = coID;
+                        eh.User_ID = uid;
+                        eh.Department = TxtbxDepartment.Text;
+                        eh.Position = TxtbxPosition.Text;
+                        eh.Title = TxtbxTitle.Text;
+                        eh.From_Date = (DateTime)DPFrom.SelectedDate;
+                        eh.Until_Date = (DateTime?)DPUntil.SelectedDate;
+                        eh.Curr_Emp = (bool)ChkbxCurrentEMP.IsChecked ? true : false;
+                        eh.Notes = TxtbxNotes.Text;
+                        if ((bool)ChkbxCurrentEMP.IsChecked)
+                        {
+                            eh.Until_Date = null;
+                        }
+                        db.Entry(eh).State = EntityState.Modified;
+                        db.SaveChanges();
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + ex.InnerException, "Save emp_his error");
             }
             ClearFields();
             FillGrdRef();
@@ -314,26 +411,34 @@ namespace XBAPLexiconCVDBInterface.Views
         private void GrdEmpHis_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             BtnDeleteExp.IsEnabled = false;
+            BtnSaveExp.Content = "Edit Experience";
             if (GrdEmpHis.SelectedIndex >= 0)
             {
                 var obj = GrdEmpHis.SelectedItem;
                 System.Type type = obj.GetType();
                 emp_hisID = (int)type.GetProperty("EMP_HIS_ID").GetValue(obj, null);
-                using (var db = new CVDBContext())
+                try
                 {
-                    Employment_Histories eh = db.Employment_Histories.Find(emp_hisID);
-                    TxtbxDepartment.Text = eh.Department;
-                    TxtbxNotes.Text = eh.Notes;
-                    TxtbxPosition.Text = eh.Position;
-                    TxtbxTitle.Text = eh.Title;
-                    DPFrom.SelectedDate = eh.From_Date;
-                    DPUntil.SelectedDate = eh.Until_Date;
-                    if (eh.Curr_Emp)
-                        ChkbxCurrentEMP.IsChecked = true;
-                    if (eh.REF_ID != null)
-                        FillRef((int)eh.REF_ID);
-                    if (eh.Company_ID != null)
-                        TxtbxCompany.Text = GetCompanyName((int)eh.Company_ID);
+                    using (var db = new CVDBContext())
+                    {
+                        Employment_Histories eh = db.Employment_Histories.Find(emp_hisID);
+                        TxtbxDepartment.Text = eh.Department;
+                        TxtbxNotes.Text = eh.Notes;
+                        TxtbxPosition.Text = eh.Position;
+                        TxtbxTitle.Text = eh.Title;
+                        DPFrom.SelectedDate = eh.From_Date;
+                        DPUntil.SelectedDate = eh.Until_Date;
+                        if (eh.Curr_Emp)
+                            ChkbxCurrentEMP.IsChecked = true;
+                        if (eh.REF_ID != null)
+                            FillRef((int)eh.REF_ID);
+                        if (eh.Company_ID != null)
+                            TxtbxCompany.Text = GetCompanyName((int)eh.Company_ID);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message + ex.InnerException, "Error");
                 }
                 BtnDeleteExp.IsEnabled = true;
             }
@@ -342,16 +447,28 @@ namespace XBAPLexiconCVDBInterface.Views
         private void BtnDeleteExp_Click(object sender, RoutedEventArgs e)
         {
             ClearFields();
-            using (var db = new CVDBContext())
+            try
             {
-                var query = from exp in db.Employment_Histories
-                            where exp.EMP_HIS_ID == emp_hisID
-                            select exp;
-                Employment_Histories ehToDelete = query.FirstOrDefault();
-                db.Employment_Histories.Remove(ehToDelete);
-                db.SaveChanges();
+                using (var db = new CVDBContext())
+                {
+                    var query = from exp in db.Employment_Histories
+                                where exp.EMP_HIS_ID == emp_hisID
+                                select exp;
+                    Employment_Histories ehToDelete = query.FirstOrDefault();
+                    db.Employment_Histories.Remove(ehToDelete);
+                    db.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + ex.InnerException, "Error");
             }
             FillGrdRef();
+        }
+
+        private void Btn_ClearAll_Click(object sender, RoutedEventArgs e)
+        {
+            ClearFields();
         }
     }
 

@@ -31,7 +31,7 @@ namespace XBAPLexiconCVDBInterface.Views
 
             FillGrdEdu();
             BtnDeleteEdu.IsEnabled = false;
-
+            ClearFields();
         }
 
         private void BtnPage2_Click(object sender, RoutedEventArgs e)
@@ -76,68 +76,119 @@ namespace XBAPLexiconCVDBInterface.Views
 
         public void FillGrdEdu()
         {
-            using (var db = new CVDBContext())
+            try
             {
-                var query = from rel in db.User_EDU_REL
-                            join e in db.Educations on rel.EDU_ID equals e.EDU_ID
-                            where rel.User_ID == uid
-                            select new { e.EDU_ID, e.School, e.Course, e.Degree, e.Year };
-                GrdEdu.ItemsSource = query.ToList();
+                using (var db = new CVDBContext())
+                {
+                    var query = from rel in db.User_EDU_REL
+                                join e in db.Educations on rel.EDU_ID equals e.EDU_ID
+                                where rel.User_ID == uid
+                                select new { e.EDU_ID, e.School, e.Course, e.Degree, e.Year };
+                    GrdEdu.ItemsSource = query.ToList();
+                }
+                GrdEdu.SelectedIndex = -1;
             }
-            GrdEdu.SelectedIndex = -1;
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + ex.InnerException, "fill grid error");
+            }
         }
 
         int eduID;
         Educations eduToAdd;
         private async Task<int> AddEdu()
         {
-            int tmp = Convert.ToInt16(TxtbxYear.Text);
-            using (var db = new CVDBContext())
+            try
             {
-                var query = from edu in db.Educations
-                            where edu.Course == TxtbxCourse.Text && edu.Degree == TxtbxDegree.Text && edu.School == TxtbxSchool.Text && edu.Year == tmp && edu.Notes == TxtbxNotes.Text
-                            select edu;
+                int tmp = Convert.ToInt16(TxtbxYear.Text);
 
-                eduToAdd = new Educations
+                using (var db = new CVDBContext())
                 {
-                    Course = TxtbxCourse.Text,
-                    Degree = TxtbxDegree.Text,
-                    Year = Convert.ToInt16(TxtbxYear.Text),
-                    Notes = TxtbxNotes.Text,
-                    School = TxtbxSchool.Text
-                };
-                if (query.Count() < 1)
-                {
-                    db.Educations.Add(eduToAdd);
-                    db.Entry(eduToAdd).State = EntityState.Added;
-                    await db.SaveChangesAsync();
-                    eduID = eduToAdd.GetEduID();
+                    var query = from edu in db.Educations
+                                where edu.EDU_ID == IDtoshow
+                                select edu;
+
+                    if (query.Count() < 1)
+                    {
+                        eduToAdd = new Educations
+                        {
+                            Course = TxtbxCourse.Text,
+                            Degree = TxtbxDegree.Text,
+                            Year = Convert.ToInt16(TxtbxYear.Text),
+                            Notes = TxtbxNotes.Text,
+                            School = TxtbxSchool.Text
+                        };
+                        db.Educations.Add(eduToAdd);
+                        db.Entry(eduToAdd).State = EntityState.Added;
+                        await db.SaveChangesAsync();
+                        eduID = eduToAdd.GetEduID();
+                    }
+                    else
+                    {
+                        eduToAdd = query.FirstOrDefault();
+                        eduToAdd.Course = TxtbxCourse.Text;
+                        eduToAdd.Degree = TxtbxDegree.Text;
+                        eduToAdd.Year = Convert.ToInt16(TxtbxYear.Text);
+                        eduToAdd.Notes = TxtbxNotes.Text;
+                        eduToAdd.School = TxtbxSchool.Text;
+                        eduID = eduToAdd.EDU_ID;
+                        db.Entry(eduToAdd).State = EntityState.Modified;
+                        db.SaveChanges();
+                    }
                 }
-                else
-                {
-                    eduID = query.FirstOrDefault().EDU_ID;
-                }
+                return eduID;
             }
-            return eduID;
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + ex.InnerException, "add education error");
+                return 0;
+            }
         }
 
         private async void BtnAddEdu_Click(object sender, RoutedEventArgs e)
         {
-            int tmp = await AddEdu();
+            int tmp = 0;
+            try
+            {
+                tmp = await AddEdu();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + ex.InnerException, "save education error");
+            }
             //eduID = eduToAdd.EDU_ID;
             //eduID = eduToAdd.GetEduID();
-            using (var db = new CVDBContext())
+            try
             {
-                User_EDU_REL uer = new User_EDU_REL
+                using (var db = new CVDBContext())
                 {
-                    User_ID = uid,
-                    EDU_ID = tmp
-                };
-                db.User_EDU_REL.Add(uer);
-                db.Entry(uer).State = EntityState.Added;
-                db.SaveChanges();
-                FillGrdEdu();
-                ClearFields();
+                    var query = from rel in db.User_EDU_REL
+                                where rel.User_ID == uid && rel.EDU_ID == tmp
+                                select rel.User_EDU_ID;
+                    int i = query.FirstOrDefault();
+                    User_EDU_REL uer = db.User_EDU_REL.Find(i);
+                    if (uer == null)
+                    {
+                        uer = new User_EDU_REL
+                        {
+                            User_ID = uid,
+                            EDU_ID = tmp
+                        };
+                        db.User_EDU_REL.Add(uer);
+                        db.Entry(uer).State = EntityState.Added;
+                    }
+                    else
+                    {
+                        db.Entry(uer).State = EntityState.Modified;
+                    }
+                    db.SaveChanges();
+                    FillGrdEdu();
+                    ClearFields();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + ex.InnerException, "save user edu relationship error");
             }
         }
 
@@ -164,42 +215,57 @@ namespace XBAPLexiconCVDBInterface.Views
         int IDtoshow;
         private void GrdEdu_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            BtnDeleteEdu.IsEnabled = false;
-            if (GrdEdu.SelectedIndex >= 0)
+            try
             {
-                var obj = GrdEdu.SelectedItem;
-                System.Type type = obj.GetType();
-                IDtoshow = (int)type.GetProperty("EDU_ID").GetValue(obj, null);
-                using (var db = new CVDBContext())
+                BtnDeleteEdu.IsEnabled = false;
+                if (GrdEdu.SelectedIndex >= 0)
                 {
-                    Educations education = db.Educations.Find(IDtoshow);
-                    TxtbxCourse.Text = education.Course;
-                    TxtbxDegree.Text = education.Degree;
-                    TxtbxNotes.Text = education.Notes;
-                    TxtbxSchool.Text = education.School;
-                    TxtbxYear.Text = education.Year.ToString();
+                    var obj = GrdEdu.SelectedItem;
+                    System.Type type = obj.GetType();
+                    IDtoshow = (int)type.GetProperty("EDU_ID").GetValue(obj, null);
+                    using (var db = new CVDBContext())
+                    {
+                        Educations education = db.Educations.Find(IDtoshow);
+                        TxtbxCourse.Text = education.Course;
+                        TxtbxDegree.Text = education.Degree;
+                        TxtbxNotes.Text = education.Notes;
+                        TxtbxSchool.Text = education.School;
+                        TxtbxYear.Text = education.Year.ToString();
+                    }
+                    BtnDeleteEdu.IsEnabled = true;
+                    BtnAddEdu.Content = "Edit";
                 }
-                BtnDeleteEdu.IsEnabled = true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + ex.InnerException, "selection changed error");
             }
         }
 
         private void BtnDeleteEdu_Click(object sender, RoutedEventArgs e)
         {
-            using (var db = new CVDBContext())
+            try
             {
-                var query = from rel in db.User_EDU_REL
-                            where rel.User_ID == uid && rel.EDU_ID == IDtoshow
-                            select rel;
-                User_EDU_REL uerToDelete = query.FirstOrDefault();
-                db.User_EDU_REL.Remove(uerToDelete);
-                db.SaveChanges();
+                using (var db = new CVDBContext())
+                {
+                    var query = from rel in db.User_EDU_REL
+                                where rel.User_ID == uid && rel.EDU_ID == IDtoshow
+                                select rel;
+                    User_EDU_REL uerToDelete = query.FirstOrDefault();
+                    db.User_EDU_REL.Remove(uerToDelete);
+                    db.SaveChanges();
 
 
-                //Educations eduToDelete = db.Educations.Find(IDtoshow);
-                //db.Educations.Remove(eduToDelete);
-                //db.SaveChanges();
-                FillGrdEdu();
-                ClearFields();
+                    //Educations eduToDelete = db.Educations.Find(IDtoshow);
+                    //db.Educations.Remove(eduToDelete);
+                    //db.SaveChanges();
+                    FillGrdEdu();
+                    ClearFields();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + ex.InnerException, "delete user edu relation error");
             }
         }
 
@@ -210,6 +276,8 @@ namespace XBAPLexiconCVDBInterface.Views
             TxtbxNotes.Text = "";
             TxtbxSchool.Text = "";
             TxtbxYear.Text = "";
+            BtnAddEdu.IsEnabled = false;
+            BtnAddEdu.Content = "Add";
         }
     }
 }

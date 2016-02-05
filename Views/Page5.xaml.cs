@@ -77,16 +77,23 @@ namespace XBAPLexiconCVDBInterface.Views
 
         private void FillList()
         {
-            using (var db = new CVDBContext())
+            try
             {
-                var query = from s in db.Skills
-                            orderby s.Skill_Name
-                            select s;
-
-                foreach (var s in query)
+                using (var db = new CVDBContext())
                 {
-                    tmpList.Add(s.Skill_Name);
+                    var query = from s in db.Skills
+                                orderby s.Skill_Name
+                                select s;
+
+                    foreach (var s in query)
+                    {
+                        tmpList.Add(s.Skill_Name);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + ex.InnerException, "Fill skill list error");
             }
         }
 
@@ -101,17 +108,24 @@ namespace XBAPLexiconCVDBInterface.Views
 
         private void FillSkillsList()
         {
-            skillsList.Clear();
-            using (var db = new CVDBContext())
+            try
             {
-                var query = from rel in db.User_Skill_REL
-                            join skill in db.Skills on rel.Skill_ID equals skill.Skill_ID
-                            where rel.User_ID == uid
-                            select skill;
-                foreach (var v in query)
+                skillsList.Clear();
+                using (var db = new CVDBContext())
                 {
-                    skillsList.Add(v.Skill_Name);
+                    var query = from rel in db.User_Skill_REL
+                                join skill in db.Skills on rel.Skill_ID equals skill.Skill_ID
+                                where rel.User_ID == uid
+                                select skill;
+                    foreach (var v in query)
+                    {
+                        skillsList.Add(v.Skill_Name);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + ex.InnerException, "fill user skill list error");
             }
         }
 
@@ -156,69 +170,83 @@ namespace XBAPLexiconCVDBInterface.Views
 
         private void BtnTest_Click(object sender, RoutedEventArgs e)
         {
-            Button btn = (Button)sender;
-            btn.Background = btn.Background == Brushes.LightGreen ? (SolidColorBrush)(new BrushConverter().ConvertFrom("#FFDDDDDD")) : Brushes.LightGreen;
-            using (var db = new CVDBContext())
+            try
             {
-                var query = from s in db.Skills
-                            where s.Skill_Name == btn.Content.ToString()
-                            select s;
-                Skills skill = query.FirstOrDefault();
-                User_Skill_REL s_rel = new User_Skill_REL
+                Button btn = (Button)sender;
+                btn.Background = btn.Background == Brushes.LightGreen ? (SolidColorBrush)(new BrushConverter().ConvertFrom("#FFDDDDDD")) : Brushes.LightGreen;
+                using (var db = new CVDBContext())
                 {
-                    User_ID = uid,
-                    Skill_ID = skill.Skill_ID
-                };
-                var q = from rel in db.User_Skill_REL
-                        where rel.Skill_ID == s_rel.Skill_ID &&
-                              rel.User_ID == uid
-                        select rel;
-                if (q.Count() != 1)
-                {
-                    db.User_Skill_REL.Add(s_rel);
-                    db.Entry(s_rel).State = EntityState.Added;
-                    db.SaveChanges();
+                    var query = from s in db.Skills
+                                where s.Skill_Name == btn.Content.ToString()
+                                select s;
+                    Skills skill = query.FirstOrDefault();
+                    User_Skill_REL s_rel = new User_Skill_REL
+                    {
+                        User_ID = uid,
+                        Skill_ID = skill.Skill_ID
+                    };
+                    var q = from rel in db.User_Skill_REL
+                            where rel.Skill_ID == s_rel.Skill_ID &&
+                                  rel.User_ID == uid
+                            select rel;
+                    if (q.Count() != 1)
+                    {
+                        db.User_Skill_REL.Add(s_rel);
+                        db.Entry(s_rel).State = EntityState.Added;
+                        db.SaveChanges();
+                    }
+                    else
+                    {
+                        User_Skill_REL relToDelete = q.FirstOrDefault();
+                        db.User_Skill_REL.Remove(relToDelete);
+                        db.SaveChanges();
+                    }
+                    FillSkillsList();
+                    PopulateLabel();
                 }
-                else
-                {
-                    User_Skill_REL relToDelete = q.FirstOrDefault();
-                    db.User_Skill_REL.Remove(relToDelete);
-                    db.SaveChanges();
-                }
-                FillSkillsList();
-                PopulateLabel();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + ex.InnerException, "skill button error");
             }
         }
 
         bool isClicked = false;
         private void BtnAddSkill_Click(object sender, RoutedEventArgs e)
         {
-            if (isClicked)
+            try
             {
-                isClicked = false;
-                BtnAddSkill.Content = "Add Skill";
-                if (TxtbxAddSkill.Text.Length > 0)
+                if (isClicked)
                 {
-                    using (var db = new CVDBContext())
+                    isClicked = false;
+                    BtnAddSkill.Content = "Add Skill";
+                    if (TxtbxAddSkill.Text.Length > 0)
                     {
-                        Skills skillToAdd = new Skills
+                        using (var db = new CVDBContext())
                         {
-                            Skill_Name = TxtbxAddSkill.Text
-                        };
-                        db.Skills.Add(skillToAdd);
-                        db.Entry(skillToAdd).State = EntityState.Added;
-                        db.SaveChanges();
+                            Skills skillToAdd = new Skills
+                            {
+                                Skill_Name = TxtbxAddSkill.Text
+                            };
+                            db.Skills.Add(skillToAdd);
+                            db.Entry(skillToAdd).State = EntityState.Added;
+                            db.SaveChanges();
+                        }
                     }
+                    TxtbxAddSkill.Visibility = Visibility.Hidden;
+                    Reload();
                 }
-                TxtbxAddSkill.Visibility = Visibility.Hidden;
-                Reload();
+                else
+                {
+                    BtnAddSkill.Content = "Save";
+                    isClicked = true;
+                    TxtbxAddSkill.Text = "";
+                    TxtbxAddSkill.Visibility = Visibility.Visible;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                BtnAddSkill.Content = "Save";
-                isClicked = true;
-                TxtbxAddSkill.Text = "";
-                TxtbxAddSkill.Visibility = Visibility.Visible;
+                MessageBox.Show(ex.Message + ex.InnerException, "add skill error");
             }
         }
 

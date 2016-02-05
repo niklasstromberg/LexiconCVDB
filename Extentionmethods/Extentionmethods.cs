@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -150,9 +151,27 @@ namespace XBAPLexiconCVDBInterface.Extentionmethods
             }
         }
 
-        public static void Save(this Page1 p, Users user, Adresses adress)
+        public static async void Save(this Page2 p, Users user, Adresses adress)
         {
+            int aid = await adress.Save();
+        }
 
+        public static async Task<int> Save(this Adresses a)
+        {
+            using (var db = new CVDBContext())
+            {
+                if (a.Adress_ID < 1 || a.Adress_ID == null)
+                {
+                    db.Adresses.Add(a);
+                    db.Entry(a).State = EntityState.Added;
+                }
+                else
+                {
+                    db.Entry(a).State = EntityState.Modified;
+                }
+                await db.SaveChangesAsync();
+                return a.Adress_ID;
+            }
         }
     }
 }
