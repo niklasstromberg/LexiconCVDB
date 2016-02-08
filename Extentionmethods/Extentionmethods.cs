@@ -143,7 +143,7 @@ namespace XBAPLexiconCVDBInterface.Extentionmethods
                     var query4 = from u in db.Users
                                  join ud in db.User_Details on u.User_ID equals ud.User_ID
                                  where u.User_ID == user
-                                 orderby u.Last_Name, u.First_Name, ud.Available, ud.Available_Date
+                                 orderby u.Last_Name, u.First_Name, ud.Available ascending, ud.Available_Date descending
                                  select new { u.User_ID, u.First_Name, u.Last_Name, ud.Available, ud.Available_Date, tagstring, skillstring };
                     gridlist.Add(query4.First());
                 }

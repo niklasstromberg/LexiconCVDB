@@ -295,9 +295,17 @@
   <ItemGroup>
     <EmbeddedResource Include="Img\user.jpg" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Img\searchimg.jpg" />
+  </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\logo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Img\dogtagimage.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Img\toetagimage.png" />
   </ItemGroup>
   <PropertyGroup>
     <StartArguments />

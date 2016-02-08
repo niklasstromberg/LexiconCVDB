@@ -10,7 +10,7 @@
 
     <Grid>
         <Border BorderBrush="WhiteSmoke" BorderThickness="1" HorizontalAlignment="Left" Height="429" Margin="0,10,0,0" VerticalAlignment="Top" Width="562"/>
-        <Button x:Name="BtnPage0" Content="&lt;" HorizontalAlignment="Left" VerticalAlignment="Top" Width="40" Height="40" ToolTip="Previous" FontSize="18" Margin="477,389,0,0" RenderTransformOrigin="0.675,1.275" IsEnabled="False"/>
+        <!--<Button x:Name="BtnPage0" Content="&lt;" HorizontalAlignment="Left" VerticalAlignment="Top" Width="40" Height="40" ToolTip="Previous" FontSize="18" Margin="477,389,0,0" RenderTransformOrigin="0.675,1.275" IsEnabled="False"/>-->
         <TextBox x:Name="TxtbxFirstName" HorizontalAlignment="Left" Height="23" Margin="146,15,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="163" ToolTip="First Name" BorderBrush="Red" TextChanged="TxtbxFirstName_TextChanged" MouseEnter="TxtbxFirstName_MouseEnter" MouseLeave="TxtbxFirstName_MouseEnter"/>
         <TextBox x:Name="TxtbxLastName" HorizontalAlignment="Left" Height="23" Margin="314,15,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="173" ToolTip="Last Name" BorderBrush="Red" TextChanged="TxtbxLastName_TextChanged"/>
         <TextBox x:Name="TxtbxTitle" HorizontalAlignment="Left" Height="23" Margin="39,15,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="102" ToolTip="Title"/>
@@ -30,8 +30,8 @@
 
         <Label x:Name="LblEnglish" Content="English" HorizontalAlignment="Left" Margin="146,176,0,0" VerticalAlignment="Top"/>
         <Label x:Name="LblSwedish" Content="Swedish" HorizontalAlignment="Left" Margin="146,150,0,0" VerticalAlignment="Top"/>
-        <Button x:Name="BtnPage3" Content="&gt;" HorizontalAlignment="Left" Margin="522,389,0,0" VerticalAlignment="Top" Width="40" Height="40" ToolTip="Education" FontSize="18" Click="BtnPage3_Click"/>
-        <Label x:Name="LblPage" Content="Personal Information" HorizontalAlignment="Left" Margin="444,358,0,0" VerticalAlignment="Top" Width="135"/>
+        <!--<Button x:Name="BtnPage3" Content="&gt;" HorizontalAlignment="Left" Margin="522,389,0,0" VerticalAlignment="Top" Width="40" Height="40" ToolTip="Education" FontSize="18" Click="BtnPage3_Click"/> -->
+        <!--<Label x:Name="LblPage" Content="Personal Information" HorizontalAlignment="Left" Margin="444,358,0,0" VerticalAlignment="Top" Width="135"/>-->
         <Expander x:Name="ExpLocations" Header="Locations" HorizontalAlignment="Left" Margin="39,71,0,0" VerticalAlignment="Top" Width="102" ToolTip="Locations">
             <StackPanel>
                 <CheckBox x:Name="chksthlm" Content="Stockholm"/>
