@@ -269,5 +269,44 @@ namespace XBAPLexiconCVDBInterface.Views
                 //pageFrame.Source = new Uri("Page4.xaml", UriKind.Relative);
             }
         }
+
+        private void BtnTest_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            Button b = sender as Button;
+            string name = b.Content.ToString();
+            MessageBoxResult result = 
+                MessageBox.Show("Really delete skill " + name + "?", "Confirm", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            switch(result)
+            {
+                case MessageBoxResult.None:
+                    break;
+                case MessageBoxResult.Yes:
+                     using (var db = new CVDBContext())
+                    {
+                        var query1 = from rel in db.User_Skill_REL
+                                     join skill in db.Skills on rel.Skill_ID equals skill.Skill_ID
+                                     where skill.Skill_Name == name
+                                     select rel;
+                        int i = query1.Count();
+                        if(i == 0)
+                        {
+                            var query2 = from sk in db.Skills
+                                         where sk.Skill_Name == name
+                                         select sk;
+                            Skills skillToDelete = query2.First();
+                            db.Skills.Remove(skillToDelete);
+                            db.SaveChanges();
+                        }
+                        else
+                        {
+                            MessageBox.Show("Couldn't remove skill " + name + " because it is in use.");
+                        }
+                    }
+                    break;
+                case MessageBoxResult.No:
+                    break;
+            }
+            Reload();
+        }
     }
 }

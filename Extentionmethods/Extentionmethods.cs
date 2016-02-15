@@ -112,15 +112,29 @@ namespace XBAPLexiconCVDBInterface.Extentionmethods
             }
         }
 
+        public class person
+        {
+            public int id { get; set; }
+            public string first_name { get; set; }
+            public string last_name { get; set; }
+            public bool available { get; set; }
+            public DateTime? date { get; set; }
+            public List <string> tags { get; set; }
+            public List<string> skills { get; set; }
+        }
+
         public static void UpdateGrid(this DataGrid grid)
         {
-            List<object> gridlist = new List<object>();
+
+            List<person> gridlist = new List<person>();
             using (var db = new CVDBContext())
             {
                 var query1 = from u in db.Users
                              select u.User_ID;
-                foreach(var user in query1.ToList())
+                foreach (var user in query1.ToList())
                 {
+                    List<string> tmptags = new List<string>();
+                    List<string> tmpskills = new List<string>();
                     var query2 = from rel in db.User_Skill_REL
                                  join skill in db.Skills on rel.Skill_ID equals skill.Skill_ID
                                  where rel.User_ID == user
@@ -128,6 +142,7 @@ namespace XBAPLexiconCVDBInterface.Extentionmethods
                     string skillstring = "";
                     foreach (var v in query2)
                     {
+                        tmpskills.Add(v);
                         skillstring += v;
                     }
                     var query3 = from rel in db.User_Tag_REL
@@ -137,16 +152,31 @@ namespace XBAPLexiconCVDBInterface.Extentionmethods
                     string tagstring = "";
                     foreach (var v in query3)
                     {
+                        tmptags.Add(v);
                         tagstring += v;
                     }
 
                     var query4 = from u in db.Users
                                  join ud in db.User_Details on u.User_ID equals ud.User_ID
                                  where u.User_ID == user
-                                 orderby u.Last_Name, u.First_Name, ud.Available ascending, ud.Available_Date descending
-                                 select new { u.User_ID, u.First_Name, u.Last_Name, ud.Available, ud.Available_Date, tagstring, skillstring };
-                    gridlist.Add(query4.First());
+                                 select new { u.User_ID, u.First_Name, u.Last_Name, ud.Available, ud.Available_Date /*, tagstring, skillstring*/ };
+                    person p = new person
+                    {
+                        id = query4.First().User_ID,
+                        first_name = query4.First().First_Name,
+                        last_name = query4.First().Last_Name,
+                        available = query4.First().Available,
+                        date = query4.First().Available_Date,
+                        tags = tmptags,
+                        skills = tmpskills
+                    };
+                    gridlist.Add(p);
                 }
+                gridlist = gridlist.OrderByDescending(x => x.available)
+                    .ThenBy(x => x.date)
+                    .ThenBy(x => x.last_name)
+                    .ThenBy(x => x.first_name)
+                    .ToList();
                 grid.ItemsSource = gridlist;
             }
         }
@@ -160,7 +190,7 @@ namespace XBAPLexiconCVDBInterface.Extentionmethods
         {
             using (var db = new CVDBContext())
             {
-                if (a.Adress_ID < 1 || a.Adress_ID == null)
+                if (a.Adress_ID < 1)
                 {
                     db.Adresses.Add(a);
                     db.Entry(a).State = EntityState.Added;

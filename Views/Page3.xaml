@@ -6,7 +6,7 @@
       mc:Ignorable="d" 
       d:DesignHeight="500" d:DesignWidth="600"
       Title="Lexicon CV Database"
-      Background="WhiteSmoke">
+      Background="Transparent">
 
 
     <Grid>
